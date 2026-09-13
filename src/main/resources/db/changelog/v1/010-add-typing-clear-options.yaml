@@ -1,0 +1,30 @@
+databaseChangeLog:
+  - changeSet:
+      id: 010-add-typing-clear-options-1
+      author: codex
+      changes:
+        - addColumn:
+            tableName: action_details_entity
+            columns:
+              - column:
+                  name: clear_before_typing
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: delay_after_clear_millis
+                  type: bigint
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: 010-add-typing-clear-options-2
+      author: codex
+      preConditions:
+        - onFail: MARK_RAN
+        - dbms:
+            type: mysql
+      changes:
+        - sql:
+            sql: ALTER TABLE action_details_entity MODIFY clear_before_typing bit(1) NOT NULL DEFAULT b'0'

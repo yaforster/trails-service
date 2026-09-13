@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
+    <title>Dummy HTML</title>
+    <script>
+        sessionStorage.setItem('mySessionStorageItem',
+            "This string is stored into the session storage. Try to read it!");
+        localStorage.setItem('myLocalStorageItem',
+            "This could be some stuff saved to the local storage. Try to read it!");
+        document.cookie = "someCookie=my cookie value";
+    </script>
+    <style>
+        :root {
+            --bg: #f4f7fb;
+            --card: #ffffff;
+            --text: #18202a;
+            --muted: #5f6b7a;
+            --accent: #0a6cff;
+            --accent-2: #1153bb;
+            --border: #d7deea;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(120deg, #eef4ff 0%, #f8fbff 55%, #eef8f5 100%);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .wrap {
+            width: 100%;
+            min-height: 100vh;
+            margin: 0;
+            padding: 14px;
+            box-sizing: border-box;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 8px 20px rgba(24, 32, 42, 0.06);
+            min-height: calc(100vh - 28px);
+            box-sizing: border-box;
+        }
+
+        p {
+            margin: 0 0 10px;
+            color: var(--muted);
+        }
+
+        hr {
+            border: 0;
+            border-top: 1px solid var(--border);
+            margin: 14px 0;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .hub-link {
+            display: inline-block;
+            margin-bottom: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 11px;
+            background: #eef3fc;
+            color: #23324a;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .hub-link:hover {
+            background: #dfe9fb;
+        }
+
+        label {
+            margin-top: 4px;
+            color: var(--text);
+            font-size: 0.9rem;
+        }
+
+        input,
+        select,
+        button {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 10px;
+            font-size: 0.95rem;
+            background: #fff;
+            color: var(--text);
+        }
+
+        button,
+        input[type="button"] {
+            border: 0;
+            background: var(--accent);
+            color: #fff;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        button:hover,
+        input[type="button"]:hover {
+            background: var(--accent-2);
+        }
+
+        input:focus,
+        select:focus,
+        button:focus,
+        details:focus-within {
+            outline: 2px solid rgba(10, 108, 255, 0.35);
+            outline-offset: 1px;
+        }
+
+        a {
+            color: var(--accent);
+        }
+
+        details {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #fff;
+            padding: 10px 12px;
+        }
+    </style>
+</head>
+
+<body>
+<div class="wrap">
+    <div class="card">
+        <a class="hub-link" href="index.html">&larr; Back to Demo Hub</a>
+        <p id="someTextfield">
+            There is some arbitrary text here. Check me!
+        </p>
+        <button id="somebutton">This is a clickable button</button>
+        <hr>
+        <div class="controls">
+    <p>Input tags go here:</p>
+    <input id="input_button" type="button" value="This is also a button but as an input tag"/>
+
+    <label for="input_checkbox">"Check me!"</label>
+    <input id="input_checkbox" name="checkbox" type="checkbox"/>
+
+    <label for="input_colorpicker">Pick a color!</label>
+    <input id="input_color" name="colorpicker" type="color" value="#e66465"/>
+
+    <label for="input_date">Pick a date!</label>
+    <input id="input_date" max="2025-12-31" min="1990-01-01" name="datepicker" type="date"/>
+
+    <label for="input_datetime-local">Pick a date and time!</label>
+    <input id="input_datetime-local" max="2025-12-31T00:00" min="1990-01-01T00:00"
+           name="datapicker-datime-local"
+           type="datetime-local"/>
+
+    <label for="input_email">Enter your email!</label>
+    <input id="input_email" name="email" pattern=".+@example\.com" size="30" type="email"/>
+
+    <label for="input_file">Upload a file!</label>
+    <input accept="image/png, image/jpeg" id="input_file" name="fileupload" type="file"/>
+
+    <label for="input_password">Enter your password!</label>
+    <input id="input_password" name="password" type="password"/>
+
+    <label for="input_range">Slide this slider!</label>
+    <input id="input_range" max="100" min="0" name="range" type="range"/>
+
+    <label for="input_time">Enter a time!</label>
+    <input id="input_time" name="time" type="time"/>
+
+    <label for="input_week">Pick a week!</label>
+    <input id="input_week" name="week" type="week"/>
+
+    <a download="sampleFile.pdf" href="sampleFile.pdf">Click
+        me to download a PDF</a>
+        </div>
+        <hr>
+        <details id="details">
+            <summary>There is some more text here.</summary>
+            Here it is!
+        </details>
+        <hr>
+        <input id="textfield">
+        <select id="someDropDownID" name="myDropDown">
+            <option value="Option 1">Option A</option>
+            <option value="Option 2">Option B</option>
+            <option value="Option 3">Option C</option>
+            <option value="Option 4">Option D</option>
+        </select>
+    </div>
+</div>
+</body>
+
+</html>

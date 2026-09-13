@@ -1,0 +1,22 @@
+databaseChangeLog:
+  - changeSet:
+      id: 019-add-element-screenshot-content-type
+      author: trails
+      changes:
+        - addColumn:
+            tableName: element_screenshot_entity
+            columns:
+              - column:
+                  name: content_type
+                  type: VARCHAR(100)
+        - update:
+            tableName: element_screenshot_entity
+            columns:
+              - column:
+                  name: content_type
+                  value: image/jpeg
+            where: content_type IS NULL
+        - addNotNullConstraint:
+            tableName: element_screenshot_entity
+            columnName: content_type
+            columnDataType: VARCHAR(100)

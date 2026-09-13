@@ -1,0 +1,21 @@
+databaseChangeLog:
+  - changeSet:
+      id: 202604251300-1
+      author: mavor
+      changes:
+        - addColumn:
+            tableName: test_run_result_entity
+            columns:
+              - column:
+                  name: test_plan_id
+                  type: bigint
+  - changeSet:
+      id: 202604251300-2
+      author: mavor
+      changes:
+        - createIndex:
+            tableName: test_run_result_entity
+            indexName: idx_test_run_result_test_plan_id
+            columns:
+              - column:
+                  name: test_plan_id

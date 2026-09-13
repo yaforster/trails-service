@@ -1,0 +1,590 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <title>Demo Hub</title>
+    <style>
+        :root {
+            --bg: #f4f7fb;
+            --card: #ffffff;
+            --text: #18202a;
+            --muted: #5f6b7a;
+            --accent: #0a6cff;
+            --accent-2: #1153bb;
+            --border: #d7deea;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(120deg, #eef4ff 0%, #f8fbff 55%, #eef8f5 100%);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .wrap {
+            width: 100%;
+            min-height: 100vh;
+            margin: 0;
+            padding: 14px;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 18px;
+            box-shadow: 0 8px 20px rgba(24, 32, 42, 0.06);
+            min-height: calc(100vh - 28px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1 {
+            margin: 0 0 8px;
+            font-size: 1.45rem;
+        }
+
+        p {
+            margin: 0 0 14px;
+            color: var(--muted);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 14px;
+            margin-top: 8px;
+            flex: 1;
+            align-content: start;
+        }
+
+        .capabilities {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #fbfdff;
+            padding: 10px 12px;
+            margin-top: 10px;
+        }
+
+        .capabilities-header {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+
+        .capabilities-header h2 {
+            margin: 0;
+            font-size: 0.96rem;
+            color: #1a2b47;
+        }
+
+        .capabilities-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            min-height: 34px;
+            border: 0;
+            border-radius: 8px;
+            padding: 7px 11px;
+            background: var(--accent);
+            color: #ffffff;
+            font: inherit;
+            font-size: 0.9rem;
+            font-weight: 650;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        button:hover {
+            background: var(--accent-2);
+        }
+
+        .status {
+            min-height: 18px;
+            color: var(--muted);
+            font-size: 0.82rem;
+        }
+
+        .status.error {
+            color: #b42318;
+        }
+
+        .capabilities-grid {
+            display: grid;
+            gap: 0;
+            border-top: 1px solid var(--border);
+        }
+
+        .capability {
+            display: grid;
+            grid-template-columns: minmax(145px, 0.9fr) minmax(120px, 0.8fr) minmax(220px, 1.4fr);
+            gap: 12px;
+            align-items: start;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--border);
+            min-width: 0;
+        }
+
+        .capability:last-child {
+            border-bottom: 0;
+        }
+
+        .capability-name {
+            color: #1b3f84;
+            font-size: 0.76rem;
+            font-weight: 700;
+            overflow-wrap: anywhere;
+        }
+
+        .capability-value {
+            color: var(--text);
+            font-size: 0.86rem;
+            font-weight: 700;
+            overflow-wrap: anywhere;
+        }
+
+        .capability-description {
+            color: var(--muted);
+            font-size: 0.8rem;
+            line-height: 1.3;
+        }
+
+        .token-helper {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #ffffff;
+            padding: 12px;
+            margin-top: 10px;
+        }
+
+        .token-helper h2 {
+            margin: 0 0 10px;
+            font-size: 0.96rem;
+            color: #1a2b47;
+        }
+
+        .token-form {
+            display: grid;
+            grid-template-columns: repeat(6, minmax(0, 1fr));
+            gap: 8px;
+            align-items: end;
+        }
+
+        .field {
+            min-width: 0;
+        }
+
+        .field label {
+            display: block;
+            margin-bottom: 4px;
+            color: var(--muted);
+            font-size: 0.74rem;
+            font-weight: 650;
+        }
+
+        .field input {
+            width: 100%;
+            min-height: 34px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 7px 9px;
+            color: var(--text);
+            font: inherit;
+            font-size: 0.86rem;
+            background: #fbfdff;
+        }
+
+        .token-viewers {
+            display: none;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .token-viewer {
+            min-width: 0;
+        }
+
+        .token-viewer h3 {
+            margin: 0 0 5px;
+            color: #1a2b47;
+            font-size: 0.84rem;
+        }
+
+        .token-output {
+            display: none;
+            margin: 0;
+            min-height: 220px;
+            max-height: 420px;
+            overflow: auto;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 9px;
+            background: #f7f9fc;
+            color: #233247;
+            font: 0.78rem Consolas, "Courier New", monospace;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
+        .demo-link {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            text-decoration: none;
+            color: inherit;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 14px;
+            background: #fbfdff;
+            transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+            min-height: 170px;
+        }
+
+        .demo-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 24px rgba(24, 32, 42, 0.10);
+            border-color: #c7d3e7;
+        }
+
+        .demo-link h2 {
+            margin: 0;
+            font-size: 1.02rem;
+            color: #1a2b47;
+        }
+
+        .demo-link p {
+            margin: 0;
+            font-size: 0.92rem;
+        }
+
+        .badge {
+            width: fit-content;
+            border: 1px solid #d4e1f8;
+            color: #1b3f84;
+            background: #edf3ff;
+            border-radius: 999px;
+            padding: 4px 10px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        @media (max-width: 1050px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .capability {
+                grid-template-columns: 1fr;
+                gap: 3px;
+            }
+
+            .token-form {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .demo-link {
+                min-height: 0;
+            }
+        }
+
+        @media (max-width: 650px) {
+            .token-form {
+                grid-template-columns: 1fr;
+            }
+
+            .token-viewers {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <div class="card">
+        <h1>Demo Navigation Hub</h1>
+        <p>Central start page for navigating all demo resources.</p>
+
+        <section class="capabilities">
+            <div class="capabilities-header">
+                <h2>Service Capabilities</h2>
+                <div class="capabilities-actions">
+                    <span class="status" id="capabilitiesStatus">Not loaded yet.</span>
+                    <button id="loadCapabilitiesBtn" type="button">Load Capabilities</button>
+                </div>
+            </div>
+            <div class="capabilities-grid" id="capabilitiesGrid">
+                <div class="capability">
+                    <div class="capability-name">/api/capabilities</div>
+                    <div class="capability-value">No data loaded</div>
+                    <div class="capability-description">Fetch the service rules that clients can use for validation.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="token-helper">
+            <h2>Keycloak Token Helper</h2>
+            <form class="token-form" id="tokenForm">
+                <div class="field">
+                    <label for="keycloakBaseUrl">Keycloak URL</label>
+                    <input id="keycloakBaseUrl" name="keycloakBaseUrl" type="url" value="http://localhost:8081">
+                </div>
+                <div class="field">
+                    <label for="keycloakRealm">Realm</label>
+                    <input id="keycloakRealm" name="keycloakRealm" type="text" value="master">
+                </div>
+                <div class="field">
+                    <label for="keycloakClientId">Client ID</label>
+                    <input id="keycloakClientId" name="keycloakClientId" type="text">
+                </div>
+                <div class="field">
+                    <label for="keycloakClientSecret">Client Secret</label>
+                    <input id="keycloakClientSecret" name="keycloakClientSecret" type="password">
+                </div>
+                <div class="field">
+                    <label for="keycloakUsername">Username</label>
+                    <input autocomplete="username" id="keycloakUsername" name="keycloakUsername" type="text">
+                </div>
+                <div class="field">
+                    <label for="keycloakPassword">Password</label>
+                    <input autocomplete="current-password" id="keycloakPassword" name="keycloakPassword"
+                           type="password">
+                </div>
+                <button id="fetchTokenBtn" type="submit">Fetch Token</button>
+                <span class="status" id="tokenStatus">No request sent.</span>
+            </form>
+            <div class="token-viewers" id="tokenViewers">
+                <div class="token-viewer">
+                    <h3>Raw Response</h3>
+                    <pre class="token-output" id="tokenOutput"></pre>
+                </div>
+                <div class="token-viewer">
+                    <h3>Decoded Access Token</h3>
+                    <pre class="token-output" id="accessTokenOutput"></pre>
+                </div>
+                <div class="token-viewer">
+                    <h3>Decoded ID Token</h3>
+                    <pre class="token-output" id="idTokenOutput"></pre>
+                </div>
+                <div class="token-viewer">
+                    <h3>Decoded Refresh Token</h3>
+                    <pre class="token-output" id="refreshTokenOutput"></pre>
+                </div>
+            </div>
+        </section>
+
+        <div class="grid">
+            <a class="demo-link" href="dummy.html">
+                <span class="badge">UI Elements</span>
+                <h2>Dummy HTML</h2>
+                <p>General-purpose page with varied input controls, storage/cookie setup, and testable DOM elements.</p>
+            </a>
+
+            <a class="demo-link" href="hateoas-navigation-demo.html">
+                <span class="badge">API Explorer</span>
+                <h2>HATEOAS Navigation Demo</h2>
+                <p>Traverse links as a tree, inspect payloads, and test print/statistics related navigation flows.</p>
+            </a>
+
+            <a class="demo-link" href="controller-crud-demo.html">
+                <span class="badge">Controller CRUD</span>
+                <h2>Controller CRUD Demo</h2>
+                <p>Create applications, stages, elements, and upload element screenshots through the REST
+                    controllers.</p>
+            </a>
+
+            <a class="demo-link" href="test-execution-demo.html">
+                <span class="badge">Execution Flow</span>
+                <h2>Test Execution Demo</h2>
+                <p>Send a test execution request, listen on SSE completion events, and inspect resulting payloads.</p>
+            </a>
+        </div>
+    </div>
+</div>
+<script>
+    const capabilitiesStatusEl = document.getElementById("capabilitiesStatus");
+    const capabilitiesGridEl = document.getElementById("capabilitiesGrid");
+    const loadCapabilitiesBtn = document.getElementById("loadCapabilitiesBtn");
+    const tokenFormEl = document.getElementById("tokenForm");
+    const tokenStatusEl = document.getElementById("tokenStatus");
+    const tokenViewersEl = document.getElementById("tokenViewers");
+    const tokenOutputEl = document.getElementById("tokenOutput");
+    const accessTokenOutputEl = document.getElementById("accessTokenOutput");
+    const idTokenOutputEl = document.getElementById("idTokenOutput");
+    const refreshTokenOutputEl = document.getElementById("refreshTokenOutput");
+
+    function setCapabilitiesStatus(text, isError) {
+        capabilitiesStatusEl.textContent = text;
+        capabilitiesStatusEl.className = isError ? "status error" : "status";
+    }
+
+    function renderCapability(capability) {
+        const item = document.createElement("div");
+        item.className = "capability";
+
+        const name = document.createElement("div");
+        name.className = "capability-name";
+        name.textContent = capability.name || "UNKNOWN";
+
+        const value = document.createElement("div");
+        value.className = "capability-value";
+        value.textContent = capability.value || "";
+
+        const description = document.createElement("div");
+        description.className = "capability-description";
+        description.textContent = capability.description || "";
+
+        item.append(name, value, description);
+        return item;
+    }
+
+    async function loadCapabilities() {
+        setCapabilitiesStatus("Loading /api/capabilities ...", false);
+        try {
+            const response = await fetch("/api/capabilities", {
+                method: "GET",
+                headers: {"Accept": "application/json"}
+            });
+            if (!response.ok) {
+                setCapabilitiesStatus("Request failed with HTTP " + response.status + ".", true);
+                return;
+            }
+            const payload = await response.json();
+            capabilitiesGridEl.innerHTML = "";
+            if (!Array.isArray(payload) || payload.length === 0) {
+                setCapabilitiesStatus("No capabilities returned.", true);
+                return;
+            }
+            payload.forEach((capability) => capabilitiesGridEl.appendChild(renderCapability(capability)));
+            setCapabilitiesStatus("Loaded " + payload.length + " capabilities.", false);
+        } catch (error) {
+            setCapabilitiesStatus("Failed to load capabilities: " + error.message, true);
+        }
+    }
+
+    function setTokenStatus(text, isError) {
+        tokenStatusEl.textContent = text;
+        tokenStatusEl.className = isError ? "status error" : "status";
+    }
+
+    function getFormValue(formData, name) {
+        return String(formData.get(name) || "").trim();
+    }
+
+    function resetTokenOutputs() {
+        tokenViewersEl.style.display = "none";
+        [tokenOutputEl, accessTokenOutputEl, idTokenOutputEl, refreshTokenOutputEl].forEach((output) => {
+            output.style.display = "none";
+            output.textContent = "";
+        });
+    }
+
+    function showOutput(output, value) {
+        output.textContent = value;
+        output.style.display = "block";
+        tokenViewersEl.style.display = "grid";
+    }
+
+    function decodeJwtPayload(token) {
+        const parts = String(token || "").split(".");
+        if (parts.length < 2) {
+            return "No JWT payload found.";
+        }
+        const base64 = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+        const padded = base64.padEnd(base64.length + ((4 - base64.length % 4) % 4), "=");
+        const decoded = atob(padded);
+        const json = decodeURIComponent(Array.from(decoded)
+            .map((char) => "%" + char.charCodeAt(0).toString(16).padStart(2, "0"))
+            .join(""));
+        return JSON.stringify(JSON.parse(json), null, 2);
+    }
+
+    function renderDecodedToken(output, token) {
+        if (!token) {
+            return;
+        }
+        try {
+            showOutput(output, decodeJwtPayload(token));
+        } catch (error) {
+            showOutput(output, "Failed to decode token: " + error.message);
+        }
+    }
+
+    async function fetchKeycloakToken(event) {
+        event.preventDefault();
+        const formData = new FormData(tokenFormEl);
+        const baseUrl = getFormValue(formData, "keycloakBaseUrl").replace(/\/$/, "");
+        const realm = getFormValue(formData, "keycloakRealm");
+        const clientId = getFormValue(formData, "keycloakClientId");
+        const clientSecret = getFormValue(formData, "keycloakClientSecret");
+        const username = getFormValue(formData, "keycloakUsername");
+        const password = String(formData.get("keycloakPassword") || "");
+
+        resetTokenOutputs();
+
+        if (!baseUrl || !realm || !clientId || !username || !password) {
+            setTokenStatus("Missing required token request fields.", true);
+            return;
+        }
+
+        const body = new URLSearchParams();
+        body.set("grant_type", "password");
+        body.set("client_id", clientId);
+        body.set("username", username);
+        body.set("password", password);
+        if (clientSecret) {
+            body.set("client_secret", clientSecret);
+        }
+
+        setTokenStatus("Requesting token ...", false);
+        try {
+            const response = await fetch(
+                baseUrl + "/realms/" + encodeURIComponent(realm) + "/protocol/openid-connect/token",
+                {
+                    method: "POST",
+                    headers: {"Content-Type": "application/x-www-form-urlencoded"},
+                    body
+                }
+            );
+            const text = await response.text();
+            let rawOutput;
+            let payload = null;
+            try {
+                payload = JSON.parse(text);
+                rawOutput = JSON.stringify(payload, null, 2);
+            } catch (parseError) {
+                rawOutput = text;
+            }
+            showOutput(tokenOutputEl, rawOutput);
+            if (payload) {
+                renderDecodedToken(accessTokenOutputEl, payload.access_token);
+                renderDecodedToken(idTokenOutputEl, payload.id_token);
+                renderDecodedToken(refreshTokenOutputEl, payload.refresh_token);
+            }
+            setTokenStatus(response.ok ? "Token response received." : "Token request failed with HTTP " + response.status + ".",
+                !response.ok);
+        } catch (error) {
+            setTokenStatus("Token request failed: " + error.message, true);
+        }
+    }
+
+    loadCapabilitiesBtn.addEventListener("click", loadCapabilities);
+    tokenFormEl.addEventListener("submit", fetchKeycloakToken);
+    loadCapabilities();
+</script>
+</body>
+</html>

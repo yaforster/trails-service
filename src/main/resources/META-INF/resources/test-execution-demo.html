@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <title>Test Execution Endpoint Demo</title>
+    <style>
+        :root {
+            --bg: #f4f7fb;
+            --card: #ffffff;
+            --text: #18202a;
+            --muted: #5f6b7a;
+            --accent: #0a6cff;
+            --accent-2: #1153bb;
+            --border: #d7deea;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(120deg, #eef4ff 0%, #f8fbff 55%, #eef8f5 100%);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .wrap {
+            width: 100%;
+            min-height: 100vh;
+            margin: 0;
+            padding: 14px;
+            box-sizing: border-box;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 8px 20px rgba(24, 32, 42, 0.06);
+            min-height: calc(100vh - 28px);
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1 {
+            margin: 0 0 8px;
+            font-size: 1.4rem;
+        }
+
+        p {
+            margin: 0 0 12px;
+            color: var(--muted);
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            align-items: end;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        label {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-width: 320px;
+            font-size: 0.9rem;
+        }
+
+        input,
+        select {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 0.95rem;
+        }
+
+        button {
+            border: 0;
+            border-radius: 8px;
+            padding: 11px 16px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            background: var(--accent);
+            color: #fff;
+        }
+
+        button:hover {
+            background: var(--accent-2);
+        }
+
+        .status {
+            margin-top: 12px;
+            font-size: 0.95rem;
+            color: var(--muted);
+        }
+
+        .hub-link {
+            width: fit-content;
+            margin-bottom: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 11px;
+            background: #eef3fc;
+            color: #23324a;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .hub-link:hover {
+            background: #dfe9fb;
+        }
+
+        .grid {
+            margin-top: 16px;
+            display: grid;
+            gap: 14px;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            flex: 1;
+            min-height: 0;
+        }
+
+        .panel h2 {
+            margin: 0 0 8px;
+            font-size: 1rem;
+        }
+
+        .panel {
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        pre {
+            margin: 0;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #0b1220;
+            color: #d8e4ff;
+            padding: 12px;
+            min-height: 0;
+            height: 100%;
+            overflow: auto;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            font-size: 0.86rem;
+            line-height: 1.45;
+            box-sizing: border-box;
+        }
+
+        @media (max-width: 1100px) {
+            .grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 900px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <div class="card">
+        <a class="hub-link" href="index.html">&larr; Back to Demo Hub</a>
+        <h1>Test Execution Demo</h1>
+        <p>Define the payload and POST it to <code>{baseUrl}/test</code>, then wait for SSE completion.</p>
+
+        <div class="controls">
+            <label>
+                Base URL (without trailing slash)
+                <input id="baseUrl" type="text" value="">
+            </label>
+            <label>
+                Test Plan ID
+                <input id="testPlanId" type="number" min="1" step="1" value="4">
+            </label>
+            <label>
+                Browsers (multi-select)
+                <select id="browsersToTest" multiple size="3">
+                    <option value="EDGE" selected>EDGE</option>
+                    <option value="FIREFOX">FIREFOX</option>
+                    <option value="CHROME">CHROME</option>
+                </select>
+            </label>
+            <button id="runBtn" type="button">Run Test</button>
+        </div>
+
+        <div class="status" id="status">Idle</div>
+
+        <div class="grid">
+            <div class="panel">
+                <h2>HTTP 202 Accepted Payload</h2>
+                <pre id="acceptedPayload">No response yet.</pre>
+            </div>
+            <div class="panel">
+                <h2>Completion Event Payload (SSE)</h2>
+                <pre id="completionPayload">No completion event yet.</pre>
+            </div>
+            <div class="panel">
+                <h2>GET Test Run Payload</h2>
+                <pre id="testRunPayload">No test run payload fetched yet.</pre>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const baseUrlInput = document.getElementById("baseUrl");
+    const testPlanIdInput = document.getElementById("testPlanId");
+    const browsersToTestInput = document.getElementById("browsersToTest");
+    const runBtn = document.getElementById("runBtn");
+    const statusEl = document.getElementById("status");
+    const acceptedPayloadEl = document.getElementById("acceptedPayload");
+    const completionPayloadEl = document.getElementById("completionPayload");
+    const testRunPayloadEl = document.getElementById("testRunPayload");
+
+    let eventSource = null;
+
+    function setStatus(text) {
+        statusEl.textContent = text;
+    }
+
+    function pretty(value) {
+        return JSON.stringify(value, null, 2);
+    }
+
+    function normalizeBaseUrl(value) {
+        return value.trim().replace(/\/+$/, "");
+    }
+
+    function getSelectedBrowsers() {
+        return Array.from(browsersToTestInput.selectedOptions).map((option) => option.value);
+    }
+
+    function buildRequestPayload() {
+        const testPlanID = Number.parseInt(testPlanIdInput.value, 10);
+        const browsersToTest = getSelectedBrowsers();
+
+        if (!Number.isInteger(testPlanID) || testPlanID <= 0) {
+            throw new Error("Please provide a valid positive Test Plan ID.");
+        }
+        if (browsersToTest.length === 0) {
+            throw new Error("Please select at least one browser.");
+        }
+
+        return {testPlanID, browsersToTest};
+    }
+
+    function updateRequestPreview() {
+        try {
+            acceptedPayloadEl.textContent = "Request payload:\n" + pretty(buildRequestPayload());
+        } catch (error) {
+            acceptedPayloadEl.textContent = String(error.message || error);
+        }
+    }
+
+    function closeEventSource() {
+        if (eventSource) {
+            eventSource.close();
+            eventSource = null;
+        }
+    }
+
+    function isTerminalEvent(dto) {
+        return dto && (dto.status === "COMPLETED" || dto.status === "FAILED");
+    }
+
+    function extractResultHref(dto) {
+        return dto && dto.links && dto.links.result ? dto.links.result.href : null;
+    }
+
+    async function fetchTestRunPayload(dto) {
+        const resultHref = extractResultHref(dto);
+        if (!resultHref || resultHref.includes("{")) {
+            testRunPayloadEl.textContent = "No concrete result link available in completion event.";
+            return;
+        }
+
+        const baseUrl = normalizeBaseUrl(baseUrlInput.value);
+        const resultUrl = new URL(resultHref, baseUrl + "/").toString();
+        testRunPayloadEl.textContent = "Fetching " + resultUrl + " ...";
+
+        const response = await fetch(resultUrl, {
+            method: "GET",
+            headers: {"Accept": "application/json"}
+        });
+        const payload = await response.json();
+        testRunPayloadEl.textContent = pretty(payload);
+    }
+
+    async function handleEventPayload(dto, eventName) {
+        if (isTerminalEvent(dto)) {
+            completionPayloadEl.textContent = pretty(dto);
+            setStatus("Received terminal event: " + dto.status);
+            if (dto.status === "COMPLETED") {
+                try {
+                    await fetchTestRunPayload(dto);
+                } catch (error) {
+                    testRunPayloadEl.textContent = "Failed to fetch test run payload: " + error.message;
+                }
+            } else {
+                testRunPayloadEl.textContent = "Skipped because terminal event is FAILED.";
+            }
+            closeEventSource();
+        } else if (eventName === "test.started") {
+            setStatus("Started event received.");
+        }
+    }
+
+    async function runTest() {
+        closeEventSource();
+        acceptedPayloadEl.textContent = "Waiting for 202 response...";
+        completionPayloadEl.textContent = "Waiting for completion event...";
+        testRunPayloadEl.textContent = "Waiting for completion event result link...";
+
+        const baseUrl = normalizeBaseUrl(baseUrlInput.value);
+        if (!baseUrl) {
+            setStatus("Please provide a valid base URL.");
+            return;
+        }
+
+        let requestPayload;
+        try {
+            requestPayload = buildRequestPayload();
+        } catch (error) {
+            setStatus(error.message || String(error));
+            acceptedPayloadEl.textContent = String(error.message || error);
+            return;
+        }
+
+        setStatus("Sending request to " + baseUrl + "/test ...");
+
+        try {
+            const response = await fetch(baseUrl + "/test", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify(requestPayload)
+            });
+
+            const responseBody = await response.json();
+
+            if (response.status !== 202) {
+                acceptedPayloadEl.textContent = pretty(responseBody);
+                setStatus("Expected 202 but got " + response.status);
+                return;
+            }
+
+            acceptedPayloadEl.textContent = pretty(responseBody);
+            const executionId = responseBody.executionId;
+            if (!executionId) {
+                setStatus("202 received, but no executionId in payload.");
+                return;
+            }
+
+            const eventsUrl = baseUrl + "/test/events/" + encodeURIComponent(executionId);
+            setStatus("Listening for SSE events on " + eventsUrl + " ...");
+
+            eventSource = new EventSource(eventsUrl);
+
+            eventSource.addEventListener("test.started", async (event) => {
+                const dto = JSON.parse(event.data);
+                await handleEventPayload(dto, "test.started");
+            });
+
+            eventSource.addEventListener("test.completed", async (event) => {
+                const dto = JSON.parse(event.data);
+                await handleEventPayload(dto, "test.completed");
+            });
+
+            eventSource.addEventListener("test.failed", async (event) => {
+                const dto = JSON.parse(event.data);
+                await handleEventPayload(dto, "test.failed");
+            });
+
+            eventSource.addEventListener("test.terminal", async (event) => {
+                const dto = JSON.parse(event.data);
+                await handleEventPayload(dto, "test.terminal");
+            });
+
+            eventSource.onmessage = async (event) => {
+                try {
+                    const dto = JSON.parse(event.data);
+                    await handleEventPayload(dto, "message");
+                } catch (e) {
+                    setStatus("Received non-JSON SSE message.");
+                }
+            };
+
+            eventSource.onerror = () => {
+                setStatus("SSE connection error/closed.");
+            };
+        } catch (error) {
+            setStatus("Request failed: " + error.message);
+            acceptedPayloadEl.textContent = String(error);
+        }
+    }
+
+    runBtn.addEventListener("click", runTest);
+    testPlanIdInput.addEventListener("input", updateRequestPreview);
+    browsersToTestInput.addEventListener("change", updateRequestPreview);
+
+    baseUrlInput.value = window.location.origin + "/api";
+    updateRequestPreview();
+</script>
+</body>
+</html>

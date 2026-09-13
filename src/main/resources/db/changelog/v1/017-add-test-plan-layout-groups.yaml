@@ -1,0 +1,69 @@
+databaseChangeLog:
+  - changeSet:
+      id: 017-add-test-plan-layout-groups
+      author: trails
+      changes:
+        - createTable:
+            tableName: test_plan_group_entity
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: test_plan_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_test_plan_group_test_plan
+                    references: test_plan_entity(id)
+              - column:
+                  name: x_coordinate_pixels
+                  type: DECIMAL(19,2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: y_coordinate_pixels
+                  type: DECIMAL(19,2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: width_pixels
+                  type: DECIMAL(19,2)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: height_pixels
+                  type: DECIMAL(19,2)
+                  constraints:
+                    nullable: false
+        - createIndex:
+            tableName: test_plan_group_entity
+            indexName: idx_test_plan_group_test_plan
+            columns:
+              - column:
+                  name: test_plan_id
+        - createTable:
+            tableName: test_plan_group_action_reference
+            columns:
+              - column:
+                  name: group_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_group_action_reference_group
+                    references: test_plan_group_entity(id)
+              - column:
+                  name: action_reference_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+        - createIndex:
+            tableName: test_plan_group_action_reference
+            indexName: idx_group_action_reference_group
+            columns:
+              - column:
+                  name: group_id

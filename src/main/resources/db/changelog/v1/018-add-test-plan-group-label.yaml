@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: 018-add-test-plan-group-label
+      author: trails
+      changes:
+        - addColumn:
+            tableName: test_plan_group_entity
+            columns:
+              - column:
+                  name: label
+                  type: VARCHAR(255)

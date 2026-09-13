@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: 011-add-explicit-wait-action-1
+      author: codex
+      changes:
+        - addColumn:
+            tableName: action_details_entity
+            columns:
+              - column:
+                  name: delay_millis
+                  type: bigint
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false

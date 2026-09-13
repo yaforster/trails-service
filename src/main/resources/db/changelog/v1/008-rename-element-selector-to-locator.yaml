@@ -1,0 +1,56 @@
+databaseChangeLog:
+  - changeSet:
+      id: 008-rename-element-selector-column
+      author: yaforster
+      preConditions:
+        onFail: MARK_RAN
+        not:
+          columnExists:
+            tableName: element_entity
+            columnName: locator
+        columnExists:
+          tableName: element_entity
+          columnName: selector
+      changes:
+        - renameColumn:
+            tableName: element_entity
+            oldColumnName: selector
+            newColumnName: locator
+            columnDataType: varchar(255)
+
+  - changeSet:
+      id: 008-drop-legacy-selector-type-check-constraint
+      author: yaforster
+      preConditions:
+        onFail: MARK_RAN
+        dbms:
+          type: mysql
+        columnExists:
+          tableName: element_entity
+          columnName: selector_type
+        sqlCheck:
+          expectedResult: "1"
+          sql: SELECT COUNT(*) FROM information_schema.check_constraints WHERE constraint_schema = DATABASE() AND constraint_name = 'element_entity_chk_1'
+      changes:
+        - sql:
+            dbms: mysql
+            sql: ALTER TABLE element_entity DROP CHECK element_entity_chk_1
+
+  - changeSet:
+      id: 008-rename-element-selector-type-column
+      author: yaforster
+      preConditions:
+        onFail: MARK_RAN
+        not:
+          columnExists:
+            tableName: element_entity
+            columnName: locator_type
+        columnExists:
+          tableName: element_entity
+          columnName: selector_type
+      changes:
+        - renameColumn:
+            tableName: element_entity
+            oldColumnName: selector_type
+            newColumnName: locator_type
+            columnDataType: tinyint

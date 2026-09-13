@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: 023-add-resize-viewport-action
+      author: openai
+      changes:
+        - addColumn:
+            tableName: action_details_entity
+            columns:
+              - column:
+                  name: viewport_width
+                  type: int
+              - column:
+                  name: viewport_height
+                  type: int

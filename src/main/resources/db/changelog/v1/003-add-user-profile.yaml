@@ -1,0 +1,38 @@
+databaseChangeLog:
+  - changeSet:
+      id: 202605052120-1
+      author: codex
+      changes:
+        - createTable:
+            tableName: user_profile_entity
+            columns:
+              - column:
+                  name: user_id
+                  type: uuid
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: first_name
+                  type: varchar(100)
+              - column:
+                  name: last_name
+                  type: varchar(100)
+              - column:
+                  name: email
+                  type: varchar(255)
+              - column:
+                  name: phone_number
+                  type: varchar(50)
+              - column:
+                  name: profile_picture_file_name
+                  type: varchar(255)
+              - column:
+                  name: profile_picture_content_type
+                  type: varchar(100)
+              - column:
+                  name: profile_picture_updated_at
+                  type: datetime
+              - column:
+                  name: profile_picture_content
+                  type: blob

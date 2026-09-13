@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - changeSet:
+      id: 202605060020-1
+      author: codex
+      changes:
+        - modifyDataType:
+            tableName: user_profile_entity
+            columnName: profile_picture_content
+            newDataType: blob(5242880)

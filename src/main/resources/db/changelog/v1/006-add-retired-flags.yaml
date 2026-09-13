@@ -1,0 +1,41 @@
+databaseChangeLog:
+  - changeSet:
+      id: 006-add-retired-flags
+      author: codex
+      changes:
+        - addColumn:
+            tableName: application_entity
+            columns:
+              - column:
+                  name: retired
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+        - addColumn:
+            tableName: stage_entity
+            columns:
+              - column:
+                  name: retired
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+        - addColumn:
+            tableName: element_entity
+            columns:
+              - column:
+                  name: retired
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+        - addColumn:
+            tableName: test_plan_entity
+            columns:
+              - column:
+                  name: retired
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false

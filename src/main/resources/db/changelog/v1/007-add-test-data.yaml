@@ -1,0 +1,75 @@
+databaseChangeLog:
+  - changeSet:
+      id: 007-add-test-data-1
+      author: codex
+      changes:
+        - createTable:
+            tableName: test_data_set_entity
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: label
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: creation_date
+                  type: datetime
+                  constraints:
+                    nullable: false
+              - column:
+                  name: retired
+                  type: boolean
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: test_data_entry_entity
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: test_data_set_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: entry_key
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: entry_value
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+        - addColumn:
+            tableName: value_computation_instruction_entity
+            columns:
+              - column:
+                  name: test_data_id
+                  type: bigint
+              - column:
+                  name: test_data_key
+                  type: varchar(255)
+        - addForeignKeyConstraint:
+            baseTableName: test_data_entry_entity
+            baseColumnNames: test_data_set_id
+            constraintName: fk_test_data_entry_test_data_set
+            referencedTableName: test_data_set_entity
+            referencedColumnNames: id
+        - addUniqueConstraint:
+            tableName: test_data_entry_entity
+            columnNames: test_data_set_id, entry_key
+            constraintName: uq_test_data_entry_key_per_set

@@ -1,0 +1,903 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <title>HATEOAS Navigation Demo</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg: #f4f7fb;
+            --card: #ffffff;
+            --text: #18202a;
+            --muted: #5f6b7a;
+            --accent: #0a6cff;
+            --accent-2: #1153bb;
+            --border: #d7deea;
+            --tree-bg: #f8fbff;
+            --warn: #9a3d00;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(120deg, #eef4ff 0%, #f8fbff 55%, #eef8f5 100%);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .wrap {
+            width: 100%;
+            min-height: 100vh;
+            margin: 0;
+            padding: 14px;
+            box-sizing: border-box;
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 8px 20px rgba(24, 32, 42, 0.06);
+            min-height: calc(100vh - 28px);
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+
+        h1 {
+            margin: 0 0 8px;
+            font-size: 1.35rem;
+        }
+
+        p {
+            margin: 0 0 12px;
+            color: var(--muted);
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            align-items: end;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        label {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-width: 220px;
+            font-size: 0.9rem;
+        }
+
+        input, button {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 0.95rem;
+        }
+
+        button {
+            border: 0;
+            font-weight: 600;
+            cursor: pointer;
+            background: var(--accent);
+            color: #fff;
+        }
+
+        button:hover {
+            background: var(--accent-2);
+        }
+
+        button.secondary {
+            background: #eef3fc;
+            color: #23324a;
+            border: 1px solid var(--border);
+        }
+
+        button.secondary:hover {
+            background: #dfe9fb;
+        }
+
+        .status {
+            margin-top: 10px;
+            font-size: 0.95rem;
+            color: var(--muted);
+        }
+
+        .status.warn {
+            color: var(--warn);
+        }
+
+        .grid {
+            margin-top: 14px;
+            display: grid;
+            grid-template-columns: 1.2fr 2fr;
+            gap: 14px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .panel {
+            min-width: 0;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .panel.payload-panel {
+            overflow: hidden;
+        }
+
+        .panel h2 {
+            margin: 0 0 8px;
+            font-size: 1rem;
+        }
+
+        .hub-link {
+            width: fit-content;
+            margin-bottom: 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 11px;
+            background: #eef3fc;
+            color: #23324a;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .hub-link:hover {
+            background: #dfe9fb;
+        }
+
+        .tree-wrap {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--tree-bg);
+            height: 100%;
+            overflow: auto;
+            padding: 10px;
+            box-sizing: border-box;
+        }
+
+        .tree-wrap ul {
+            margin: 0;
+            padding-left: 18px;
+        }
+
+        .tree-wrap li {
+            margin: 4px 0;
+        }
+
+        .node-btn {
+            border: 0;
+            border-radius: 6px;
+            background: transparent;
+            color: #213252;
+            padding: 4px 6px;
+            text-align: left;
+            cursor: pointer;
+            width: auto;
+            font-size: 0.9rem;
+        }
+
+        .node-btn.active {
+            background: #dce9ff;
+            font-weight: 600;
+        }
+
+        .node-btn:hover {
+            background: #e8f0ff;
+        }
+
+        .meta {
+            margin: 0 0 8px;
+            color: var(--muted);
+            font-size: 0.85rem;
+            overflow-wrap: anywhere;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+            align-items: end;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+
+        .actions label {
+            min-width: 200px;
+        }
+
+        pre {
+            margin: 0;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #0b1220;
+            color: #d8e4ff;
+            padding: 12px;
+            flex: 1 1 auto;
+            height: auto;
+            min-height: 260px;
+            overflow: auto;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            font-size: 0.85rem;
+            line-height: 1.45;
+            box-sizing: border-box;
+        }
+
+        .stats-panel {
+            margin: 0 0 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #f7fbff;
+            padding: 10px;
+            display: none;
+            align-self: stretch;
+            width: 100%;
+        }
+
+        .stats-title {
+            margin: 0 0 8px;
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: #1e2f4b;
+        }
+
+        .stats-meta {
+            margin-top: 8px;
+            font-size: 0.85rem;
+            color: var(--muted);
+            overflow-wrap: anywhere;
+        }
+
+        .stats-chart-wrap {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            min-height: 320px;
+            position: relative;
+        }
+
+        .stats-chart-wrap canvas {
+            width: 100% !important;
+            height: 100% !important;
+            display: block;
+        }
+
+        @media (max-width: 1100px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <div class="card">
+        <a class="hub-link" href="index.html">&larr; Back to Demo Hub</a>
+        <h1>HATEOAS Navigation Demo</h1>
+        <p>Navigate API links as a tree and inspect payloads. Supports application-to-element navigation and
+            test-run-to-action-result navigation, including print calls.</p>
+
+        <div class="controls">
+            <label>
+                Base URL (without trailing slash)
+                <input id="baseUrl" type="text" value="">
+            </label>
+            <button id="loadApplicationsBtn" type="button">Load Applications</button>
+            <label>
+                Test Runs: Application ID
+                <input id="testRunApplicationId" min="1" step="1" type="number" value="">
+            </label>
+            <label>
+                Test Runs: Stage ID
+                <input id="testRunStageId" min="1" step="1" type="number" value="">
+            </label>
+            <button id="loadTestRunsBtn" type="button">Load Test Runs</button>
+        </div>
+
+        <div class="status" id="status">Idle</div>
+
+        <div class="grid">
+            <div class="panel">
+                <h2>Navigation Tree</h2>
+                <div class="tree-wrap" id="treeContainer">No nodes loaded yet.</div>
+            </div>
+            <div class="panel payload-panel">
+                <h2>Selected Payload</h2>
+                <div class="meta" id="selectedMeta">Nothing selected.</div>
+                <div class="actions" id="dynamicActions"></div>
+                <div class="stats-panel" id="statsPanel">
+                    <div class="stats-title">Test Run Statistics</div>
+                    <div class="stats-chart-wrap">
+                        <canvas id="statsChart"></canvas>
+                    </div>
+                    <div class="stats-meta" id="statsMeta">No statistics loaded.</div>
+                </div>
+                <pre id="payloadViewer">No payload loaded yet.</pre>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const baseUrlInput = document.getElementById("baseUrl");
+    const loadApplicationsBtn = document.getElementById("loadApplicationsBtn");
+    const loadTestRunsBtn = document.getElementById("loadTestRunsBtn");
+    const testRunApplicationIdInput = document.getElementById("testRunApplicationId");
+    const testRunStageIdInput = document.getElementById("testRunStageId");
+    const statusEl = document.getElementById("status");
+    const treeContainerEl = document.getElementById("treeContainer");
+    const selectedMetaEl = document.getElementById("selectedMeta");
+    const payloadViewerEl = document.getElementById("payloadViewer");
+    const dynamicActionsEl = document.getElementById("dynamicActions");
+    const statsPanelEl = document.getElementById("statsPanel");
+    const statsMetaEl = document.getElementById("statsMeta");
+    const statsChartCanvasEl = document.getElementById("statsChart");
+
+    let nextNodeId = 1;
+    const nodes = new Map();
+    const rootNodeIds = [];
+    let selectedNodeId = null;
+    let statsChart = null;
+
+    function setStatus(text, warn) {
+        statusEl.textContent = text;
+        statusEl.className = warn ? "status warn" : "status";
+    }
+
+    function pretty(value) {
+        return JSON.stringify(value, null, 2);
+    }
+
+    function normalizeBaseUrl(value) {
+        return value.trim().replace(/\/+$/, "");
+    }
+
+    function createNode(config) {
+        const node = {
+            id: nextNodeId++,
+            label: config.label,
+            url: config.url || null,
+            parentId: config.parentId || null,
+            method: config.method || "GET",
+            children: [],
+            payload: config.payload || null,
+            fetched: Boolean(config.payload)
+        };
+        nodes.set(node.id, node);
+        if (node.parentId) {
+            const parent = nodes.get(node.parentId);
+            if (parent) {
+                parent.children.push(node.id);
+            }
+        } else {
+            rootNodeIds.push(node.id);
+        }
+        return node;
+    }
+
+    function parseLinksFromPayload(payload) {
+        const source = payload && (payload._links || payload.links);
+        if (!source || typeof source !== "object") {
+            return [];
+        }
+        const result = [];
+        Object.entries(source).forEach(([rel, descriptor]) => {
+            if (!descriptor) {
+                return;
+            }
+            if (Array.isArray(descriptor)) {
+                descriptor.forEach((entry, index) => {
+                    if (entry && entry.href) {
+                        result.push({rel: rel + "[" + index + "]", href: entry.href});
+                    }
+                });
+                return;
+            }
+            if (descriptor.href) {
+                result.push({rel, href: descriptor.href});
+            }
+        });
+        return result;
+    }
+
+    function findLinkHref(payload, rel) {
+        const source = payload && (payload._links || payload.links);
+        if (!source || typeof source !== "object") {
+            return null;
+        }
+        const descriptor = source[rel];
+        if (!descriptor) {
+            return null;
+        }
+        if (Array.isArray(descriptor)) {
+            const first = descriptor.find((entry) => entry && entry.href);
+            return first ? first.href : null;
+        }
+        return descriptor.href || null;
+    }
+
+    function itemLabel(item, index) {
+        if (!item || typeof item !== "object") {
+            return "item[" + index + "]";
+        }
+        const type = item.browserToRunIn ? "testSet"
+            : item.resultType ? "actionResult"
+                : item.locatorType ? "element"
+                    : item.url ? "stage"
+                        : item.label ? "item"
+                            : "entity";
+        const idPart = item.id ? "#" + item.id : "";
+        const labelPart = item.label ? " " + item.label : item.testPlanLabel ? " " + item.testPlanLabel : "";
+        return type + idPart + labelPart;
+    }
+
+    function resolveUrl(href) {
+        const base = normalizeBaseUrl(baseUrlInput.value);
+        return new URL(href, base + "/").toString();
+    }
+
+    function ensureChildNode(parentId, label, url, payload) {
+        const parent = nodes.get(parentId);
+        if (!parent) {
+            return null;
+        }
+        const existing = parent.children
+            .map((id) => nodes.get(id))
+            .find((node) => node && node.label === label && node.url === url);
+        if (existing) {
+            if (payload && !existing.payload) {
+                existing.payload = payload;
+                existing.fetched = true;
+            }
+            return existing;
+        }
+        return createNode({
+            parentId,
+            label,
+            url,
+            payload
+        });
+    }
+
+    function addPayloadChildren(nodeId, payload) {
+        const node = nodes.get(nodeId);
+        if (!node || !payload || typeof payload !== "object") {
+            return;
+        }
+
+        const directLinks = parseLinksFromPayload(payload);
+        directLinks.forEach((link) => {
+            ensureChildNode(node.id, link.rel, resolveUrl(link.href));
+        });
+
+        if (Array.isArray(payload.items)) {
+            payload.items.forEach((item, index) => {
+                const links = parseLinksFromPayload(item);
+                const selfLink = links.find((l) => l.rel === "self");
+                const label = itemLabel(item, index);
+                const itemNode = ensureChildNode(
+                    node.id,
+                    label,
+                    selfLink ? resolveUrl(selfLink.href) : null,
+                    selfLink ? null : item
+                );
+                if (!itemNode) {
+                    return;
+                }
+                links.filter((l) => l.rel !== "self").forEach((link) => {
+                    ensureChildNode(itemNode.id, link.rel, resolveUrl(link.href));
+                });
+            });
+        }
+    }
+
+    function hasStatisticsLink(payload) {
+        return Boolean(findLinkHref(payload, "statistics"));
+    }
+
+    function clearStatsPanel() {
+        statsPanelEl.style.display = "none";
+        statsMetaEl.textContent = "No statistics loaded.";
+        if (statsChart) {
+            statsChart.destroy();
+            statsChart = null;
+        }
+    }
+
+    function setStatsMeta(text) {
+        statsPanelEl.style.display = "block";
+        statsMetaEl.textContent = text;
+    }
+
+    async function resolveStatisticsUrl(payload) {
+        const directStatisticsLink = findLinkHref(payload, "statistics");
+        if (directStatisticsLink) {
+            return resolveUrl(directStatisticsLink);
+        }
+
+        const applicationId = payload.applicationID;
+        const stageId = payload.stageID;
+        const testPlanId = payload.id;
+        if (Number.isInteger(applicationId) && Number.isInteger(stageId) && Number.isInteger(testPlanId)) {
+            return resolveUrl("/api/applications/" + applicationId + "/stages/" + stageId +
+                "/testPlans/" + testPlanId + "/statistics");
+        }
+        return null;
+    }
+
+    function renderStatisticsChart(payload) {
+        const successCount = Number(payload.successfulRuns || 0);
+        const partialSuccessCount = Number(payload.partialSuccessRuns || 0);
+        const failureCount = Number(payload.failedRuns || 0);
+        const totalCount = successCount + partialSuccessCount + failureCount;
+        const showNoDataSlice = totalCount === 0;
+        const labels = showNoDataSlice
+            ? ["No runs yet"]
+            : ["Success", "Partial Success", "Failure"];
+        const data = showNoDataSlice ? [1] : [successCount, partialSuccessCount, failureCount];
+        const colors = showNoDataSlice
+            ? ["#8f98a8"]
+            : ["#18a957", "#f4b400", "#d93025"];
+
+        if (statsChart) {
+            statsChart.destroy();
+            statsChart = null;
+        }
+
+        if (typeof Chart === "undefined") {
+            drawFallbackPieChart(data, colors);
+            return;
+        }
+
+        try {
+            statsChart = new Chart(statsChartCanvasEl, {
+                type: "pie",
+                data: {
+                    labels,
+                    datasets: [{
+                        data,
+                        backgroundColor: colors,
+                        borderColor: "#ffffff",
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: false,
+                    plugins: {
+                        legend: {
+                            position: "bottom"
+                        }
+                    }
+                }
+            });
+        } catch (error) {
+            drawFallbackPieChart(data, colors);
+            setStatsMeta("Rendered with fallback canvas chart (" + error.message + ").");
+        }
+    }
+
+    function drawFallbackPieChart(data, colors) {
+        const context = statsChartCanvasEl.getContext("2d");
+        if (!context) {
+            return;
+        }
+
+        const rect = statsChartCanvasEl.getBoundingClientRect();
+        const width = Math.max(180, Math.floor(rect.width || 320));
+        const height = Math.max(180, Math.floor(rect.height || 220));
+        const devicePixelRatio = window.devicePixelRatio || 1;
+        statsChartCanvasEl.width = Math.floor(width * devicePixelRatio);
+        statsChartCanvasEl.height = Math.floor(height * devicePixelRatio);
+        context.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+        context.clearRect(0, 0, width, height);
+
+        const total = data.reduce((acc, value) => acc + Math.max(0, Number(value || 0)), 0);
+        const normalized = total > 0 ? data.map((value) => Math.max(0, Number(value || 0)) / total) : [1];
+        const normalizedColors = colors.length === normalized.length ? colors : ["#8f98a8"];
+
+        const centerX = width / 2;
+        const centerY = height / 2;
+        const radius = Math.max(50, Math.min(width, height) * 0.37);
+        let start = -Math.PI / 2;
+
+        normalized.forEach((slice, index) => {
+            const end = start + (Math.PI * 2 * slice);
+            context.beginPath();
+            context.moveTo(centerX, centerY);
+            context.arc(centerX, centerY, radius, start, end);
+            context.closePath();
+            context.fillStyle = normalizedColors[index] || "#8f98a8";
+            context.fill();
+            context.lineWidth = 2;
+            context.strokeStyle = "#ffffff";
+            context.stroke();
+            start = end;
+        });
+    }
+
+    async function ensureStatisticsForNode(node) {
+        if (!node || !node.payload || !hasStatisticsLink(node.payload)) {
+            clearStatsPanel();
+            return;
+        }
+
+        if (node.statisticsPayload) {
+            statsPanelEl.style.display = "block";
+            renderStatisticsChart(node.statisticsPayload);
+            setStatsMeta(
+                "Runs: " + node.statisticsPayload.totalRuns +
+                " | Success: " + node.statisticsPayload.successfulRuns +
+                " | Partial Success: " + node.statisticsPayload.partialSuccessRuns +
+                " | Failure: " + node.statisticsPayload.failedRuns
+            );
+            return;
+        }
+
+        if (node.statisticsLoading) {
+            statsPanelEl.style.display = "block";
+            setStatsMeta("Loading statistics ...");
+            return;
+        }
+
+        node.statisticsLoading = true;
+        statsPanelEl.style.display = "block";
+        setStatsMeta("Loading statistics ...");
+
+        try {
+            const statisticsUrl = await resolveStatisticsUrl(node.payload);
+            if (!statisticsUrl) {
+                setStatsMeta("No statistics link available on this payload.");
+                node.statisticsLoading = false;
+                return;
+            }
+
+            const response = await fetch(statisticsUrl, {
+                method: "GET",
+                headers: {"Accept": "application/json"}
+            });
+            if (!response.ok) {
+                setStatsMeta("Statistics request failed with HTTP " + response.status + ".");
+                node.statisticsLoading = false;
+                return;
+            }
+
+            const contentType = response.headers.get("content-type") || "";
+            if (!contentType.includes("application/json")) {
+                setStatsMeta("Statistics response is not JSON.");
+                node.statisticsLoading = false;
+                return;
+            }
+
+            const statisticsPayload = await response.json();
+            node.statisticsPayload = statisticsPayload;
+            node.statisticsLoading = false;
+            if (selectedNodeId !== node.id) {
+                return;
+            }
+            renderStatisticsChart(statisticsPayload);
+            setStatsMeta(
+                "Runs: " + statisticsPayload.totalRuns +
+                " | Success: " + statisticsPayload.successfulRuns +
+                " | Partial Success: " + statisticsPayload.partialSuccessRuns +
+                " | Failure: " + statisticsPayload.failedRuns
+            );
+        } catch (error) {
+            node.statisticsLoading = false;
+            setStatsMeta("Failed to load statistics: " + error.message);
+        }
+    }
+
+    async function fetchNode(nodeId) {
+        const node = nodes.get(nodeId);
+        if (!node) {
+            return;
+        }
+        selectedNodeId = nodeId;
+        renderTree();
+        renderSelectedNode();
+
+        if (node.payload && !node.url) {
+            return;
+        }
+        if (node.url && node.url.endsWith("/print")) {
+            setStatus("Use the Print action to call PDF endpoints.", false);
+            return;
+        }
+        if (!node.url || node.fetched) {
+            return;
+        }
+
+        setStatus("Fetching " + node.url + " ...", false);
+
+        try {
+            const response = await fetch(node.url, {
+                method: node.method,
+                headers: {"Accept": "application/json"}
+            });
+            const contentType = response.headers.get("content-type") || "";
+            if (!response.ok) {
+                const bodyText = await response.text();
+                node.payload = {status: response.status, body: bodyText};
+                node.fetched = true;
+                setStatus("Request failed with HTTP " + response.status + ".", true);
+                renderSelectedNode();
+                return;
+            }
+            if (!contentType.includes("application/json")) {
+                const bodyText = await response.text();
+                node.payload = {
+                    status: response.status,
+                    note: "Non-JSON response.",
+                    contentType,
+                    bodyPreview: bodyText.slice(0, 1200)
+                };
+                node.fetched = true;
+                setStatus("Loaded non-JSON payload from " + node.url + ".", false);
+                renderSelectedNode();
+                return;
+            }
+            const payload = await response.json();
+            node.payload = payload;
+            node.fetched = true;
+            addPayloadChildren(node.id, payload);
+            setStatus("Loaded " + node.url, false);
+            renderTree();
+            renderSelectedNode();
+        } catch (error) {
+            node.payload = {error: String(error)};
+            node.fetched = true;
+            setStatus("Failed to fetch " + node.url + ": " + error.message, true);
+            renderSelectedNode();
+        }
+    }
+
+    function createPrintAction(printUrl) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "secondary";
+        button.textContent = "Print";
+        button.addEventListener("click", () => callPrintEndpoint(printUrl));
+        dynamicActionsEl.appendChild(button);
+    }
+
+    function renderDynamicActions(node) {
+        dynamicActionsEl.innerHTML = "";
+        if (!node || !node.payload) {
+            return;
+        }
+        if (!node.url) {
+            return;
+        }
+
+        const printHref = findLinkHref(node.payload, "print");
+        if (printHref) {
+            createPrintAction(resolveUrl(printHref));
+        }
+    }
+
+    async function callPrintEndpoint(printUrl) {
+        setStatus("Calling print endpoint " + printUrl + " ...", false);
+        try {
+            const response = await fetch(printUrl, {
+                method: "GET",
+                headers: {"Accept": "application/pdf"}
+            });
+            if (!response.ok) {
+                const text = await response.text();
+                setStatus("Print failed with HTTP " + response.status + ".", true);
+                payloadViewerEl.textContent = pretty({
+                    printUrl,
+                    status: response.status,
+                    body: text
+                });
+                return;
+            }
+            const blob = await response.blob();
+            const objectUrl = URL.createObjectURL(blob);
+            window.open(objectUrl, "_blank", "noopener,noreferrer");
+            setStatus("Print endpoint responded with PDF (" + blob.size + " bytes).", false);
+        } catch (error) {
+            setStatus("Print call failed: " + error.message, true);
+        }
+    }
+
+    function renderNodeList(nodeIds) {
+        if (nodeIds.length === 0) {
+            return document.createTextNode("");
+        }
+        const ul = document.createElement("ul");
+        nodeIds.forEach((id) => {
+            const node = nodes.get(id);
+            if (!node) {
+                return;
+            }
+            const li = document.createElement("li");
+            const btn = document.createElement("button");
+            btn.type = "button";
+            btn.className = "node-btn" + (selectedNodeId === node.id ? " active" : "");
+            btn.textContent = node.label;
+            btn.title = node.url || "Inline payload node";
+            btn.addEventListener("click", () => fetchNode(node.id));
+            li.appendChild(btn);
+            if (node.children.length > 0) {
+                li.appendChild(renderNodeList(node.children));
+            }
+            ul.appendChild(li);
+        });
+        return ul;
+    }
+
+    function renderTree() {
+        treeContainerEl.innerHTML = "";
+        if (rootNodeIds.length === 0) {
+            treeContainerEl.textContent = "No nodes loaded yet.";
+            return;
+        }
+        treeContainerEl.appendChild(renderNodeList(rootNodeIds));
+    }
+
+    function renderSelectedNode() {
+        const node = selectedNodeId ? nodes.get(selectedNodeId) : null;
+        if (!node) {
+            selectedMetaEl.textContent = "Nothing selected.";
+            payloadViewerEl.textContent = "No payload loaded yet.";
+            dynamicActionsEl.innerHTML = "";
+            clearStatsPanel();
+            return;
+        }
+        selectedMetaEl.textContent = node.url ? node.url : "Inline payload node";
+        payloadViewerEl.textContent = node.payload ? pretty(node.payload) : "Not loaded yet.";
+        renderDynamicActions(node);
+        ensureStatisticsForNode(node);
+    }
+
+    function addAndLoadRoot(label, url) {
+        const existingRoot = rootNodeIds
+            .map((id) => nodes.get(id))
+            .find((node) => node && node.label === label && node.url === url);
+        const node = existingRoot || createNode({label, url});
+        fetchNode(node.id);
+    }
+
+    function loadApplicationsRoot() {
+        const base = normalizeBaseUrl(baseUrlInput.value);
+        if (!base) {
+            setStatus("Please provide a valid base URL.", true);
+            return;
+        }
+        addAndLoadRoot("applications", resolveUrl("/api/applications?page=0&size=20"));
+    }
+
+    function loadTestRunsRoot() {
+        const base = normalizeBaseUrl(baseUrlInput.value);
+        if (!base) {
+            setStatus("Please provide a valid base URL.", true);
+            return;
+        }
+        const applicationId = Number.parseInt(testRunApplicationIdInput.value, 10);
+        const stageId = Number.parseInt(testRunStageIdInput.value, 10);
+        if (!Number.isInteger(applicationId) || applicationId <= 0 || !Number.isInteger(stageId) || stageId <= 0) {
+            setStatus("Provide valid numeric Application ID and Stage ID for test runs.", true);
+            return;
+        }
+        const url = resolveUrl("/api/applications/" + applicationId + "/stages/" + stageId + "/testruns?page=0&size=20");
+        addAndLoadRoot("testRuns app=" + applicationId + " stage=" + stageId, url);
+    }
+
+    loadApplicationsBtn.addEventListener("click", loadApplicationsRoot);
+    loadTestRunsBtn.addEventListener("click", loadTestRunsRoot);
+
+    baseUrlInput.value = window.location.origin;
+    renderTree();
+    renderSelectedNode();
+</script>
+</body>
+</html>

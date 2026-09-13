@@ -1,0 +1,45 @@
+databaseChangeLog:
+  - changeSet:
+      id: 009-add-deployment-events
+      author: codex
+      changes:
+        - createTable:
+            tableName: deployment_entity
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: application_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: stage_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: version
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: deployed_at
+                  type: datetime
+                  constraints:
+                    nullable: false
+        - createIndex:
+            tableName: deployment_entity
+            indexName: idx_deployment_stage_timestamp
+            columns:
+              - column:
+                  name: application_id
+              - column:
+                  name: stage_id
+              - column:
+                  name: deployed_at

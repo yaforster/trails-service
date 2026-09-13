@@ -1,0 +1,772 @@
+databaseChangeLog:
+- changeSet:
+    id: 1776261247546-1
+    author: mavor (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+            name: details_type_id
+            type: varchar(31)
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+            name: id
+            type: bigint
+        - column:
+            name: elementid
+            type: bigint
+        - column:
+            name: cookie_name
+            type: varchar(255)
+        - column:
+            name: storage_key
+            type: varchar(255)
+        - column:
+            constraints:
+              unique: true
+            name: value_computation_id
+            type: bigint
+        tableName: action_details_entity
+- changeSet:
+    id: 1776261247546-2
+    author: mavor (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+            name: id
+            type: bigint
+        - column:
+            name: action_id
+            type: bigint
+        - column:
+            name: label
+            type: varchar(255)
+        - column:
+            name: test_plan_id
+            type: bigint
+        - column:
+            constraints:
+              nullable: false
+              unique: true
+            name: details_id
+            type: bigint
+        - column:
+            constraints:
+              nullable: false
+              unique: true
+            name: position_id
+            type: bigint
+        tableName: action_entity
+- changeSet:
+    id: 1776261247546-3
+    author: mavor (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+            name: action_entity_id
+            type: bigint
+        - column:
+            name: next_actions
+            type: bigint
+        tableName: action_entity_next_actions
+- changeSet:
+    id: 1776261247546-4
+    author: mavor (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+            name: id
+            type: bigint
+        - column:
+            name: label
+            type: varchar(255)
+        tableName: application_entity
+- changeSet:
+    id: 1776261247546-5
+    author: mavor (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            name: next_val
+            type: bigint
+        tableName: application_entity_seq
+- changeSet:
+    id: 1776261247546-6
+    author: mavor (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+            name: id
+            type: bigint
+        - column:
+            name: action_result_id
+            type: bigint
+        - column:
+            name: content_type
+            type: varchar(255)
+        - column:
+            name: filename
+            type: varchar(255)
+        - column:
+            constraints:
+              nullable: false
+            name: size
+            type: bigint
+        - column:
+            name: storage_key
+            type: varchar(255)
+        - column:
+            name: type
+            type: varchar(255)
+        tableName: artifact_entity
+- changeSet:
+    id: 1776261247546-7
+    author: mavor (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            name: next_val
+            type: bigint
+        tableName: artifact_entity_seq
+- changeSet:
+    id: 1776261247546-8
+    author: mavor (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+            name: id
+            type: bigint
+        - column:
+            name: content
+            type: blob
+        - column:
+            constraints:
+              nullable: false
+            name: file_name
+            type: varchar(255)
+        - column:
+            constraints:
+              nullable: false
+            name: test_path_result_id
+            type: bigint
+        tableName: downloaded_file_entity
+- changeSet:
+    id: 1776261247546-9
+    author: mavor (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+            name: id
+            type: bigint
+        - column:
+            name: application_id
+            type: bigint
+        - column:
+            name: label
+            type: varchar(255)
+        - column:
+            name: selector
+            type: varchar(255)
+        - column:
+            name: selector_type
+            type: tinyint
+        - column:
+            name: stage_id
+            type: bigint
+        - column:
+            name: type
+            type: tinyint
+        tableName: element_entity
+- changeSet:
+    id: 1776261247546-10
+    author: mavor (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+            name: id
+            type: bigint
+        - column:
+            name: content
+            type: blob
+        - column:
+            constraints:
+              nullable: false
+              unique: true
+            name: element_id
+            type: bigint
+        - column:
+            constraints:
+              nullable: false
+            name: file_name
+            type: varchar(255)
+        tableName: element_screenshot_entity
+- changeSet:
+    id: 1776261247546-11
+    author: mavor (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+            name: id
+            type: bigint
+        - column:
+            name: x_coordinate_pixels
+            type: decimal(38, 2)
+        - column:
+            name: y_coordinate_pixels
+            type: decimal(38, 2)
+        tableName: position_entity
+- changeSet:
+    id: 1776261247546-12
+    author: mavor (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+            name: dtype
+            type: varchar(31)
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+            name: id
+            type: bigint
+        - column:
+            name: action_id
+            type: bigint
+        - column:
+            name: execution_order
+            type: int
+        - column:
+            name: label
+            type: varchar(255)
+        - column:
+            name: message
+            type: varchar(255)
+        - column:
+            constraints:
+              nullable: false
+            name: success
+            type: boolean
+        - column:
+            name: test_path_result_id
+            type: bigint
+        - column:
+            name: exception_message_from_action
+            type: blob
+        tableName: result_entity
+- changeSet:
+    id: 1776261247546-13
+    author: mavor (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            name: next_val
+            type: bigint
+        tableName: result_entity_seq
+- changeSet:
+    id: 1776261247546-14
+    author: mavor (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+            name: id
+            type: bigint
+        - column:
+            constraints:
+              nullable: false
+            name: content
+            type: blob
+        - column:
+            constraints:
+              nullable: false
+            name: content_type
+            type: varchar(255)
+        - column:
+            constraints:
+              nullable: false
+            name: file_name
+            type: varchar(255)
+        - column:
+            constraints:
+              nullable: false
+              unique: true
+            name: result_id
+            type: bigint
+        tableName: result_screenshot_entity
+- changeSet:
+    id: 1776261247546-15
+    author: mavor (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+            name: id
+            type: bigint
+        - column:
+            name: application_id
+            type: bigint
+        - column:
+            name: label
+            type: varchar(255)
+        - column:
+            name: url
+            type: varchar(255)
+        tableName: stage_entity
+- changeSet:
+    id: 1776261247546-16
+    author: mavor (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            name: next_val
+            type: bigint
+        tableName: stage_entity_seq
+- changeSet:
+    id: 1776261247546-17
+    author: mavor (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+            name: id
+            type: bigint
+        - column:
+            name: tested_in_browser
+            type: varchar(255)
+        - column:
+            name: timestamp
+            type: datetime
+        tableName: test_case_result_entity
+- changeSet:
+    id: 1776261247546-18
+    author: mavor (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+            name: test_case_result_entity_id
+            type: bigint
+        - column:
+            constraints:
+              nullable: false
+              unique: true
+            name: results_id
+            type: bigint
+        tableName: test_case_result_entity_results
+- changeSet:
+    id: 1776261247546-19
+    author: mavor (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+            name: id
+            type: bigint
+        - column:
+            name: path_label
+            type: varchar(255)
+        - column:
+            name: test_set_result_id
+            type: bigint
+        tableName: test_path_result_entity
+- changeSet:
+    id: 1776261247546-20
+    author: mavor (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            name: next_val
+            type: bigint
+        tableName: test_path_result_entity_seq
+- changeSet:
+    id: 1776261247546-21
+    author: mavor (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+            name: id
+            type: bigint
+        - column:
+            name: application_id
+            type: bigint
+        - column:
+            name: label
+            type: varchar(255)
+        - column:
+            name: stage_id
+            type: bigint
+        tableName: test_plan_entity
+- changeSet:
+    id: 1776261247546-22
+    author: mavor (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+            name: test_plan_entity_id
+            type: bigint
+        - column:
+            constraints:
+              nullable: false
+              unique: true
+            name: test_steps_id
+            type: bigint
+        tableName: test_plan_entity_test_steps
+- changeSet:
+    id: 1776261247546-23
+    author: mavor (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+              primaryKey: true
+            name: id
+            type: bigint
+        - column:
+            name: application_id
+            type: bigint
+        - column:
+            name: label
+            type: varchar(255)
+        - column:
+            name: stage_id
+            type: bigint
+        - column:
+            name: status
+            type: varchar(255)
+        - column:
+            name: timestamp
+            type: datetime
+        tableName: test_run_result_entity
+- changeSet:
+    id: 1776261247546-24
+    author: mavor (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            name: next_val
+            type: bigint
+        tableName: test_run_result_entity_seq
+- changeSet:
+    id: 1776261247546-25
+    author: mavor (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+            name: id
+            type: bigint
+        - column:
+            name: browser
+            type: varchar(255)
+        - column:
+            name: test_plan_label
+            type: varchar(255)
+        - column:
+            name: test_run_id
+            type: bigint
+        - column:
+            constraints:
+              nullable: false
+            name: total_run_time
+            type: int
+        - column:
+            constraints:
+              unique: true
+            name: test_case_result_id
+            type: bigint
+        tableName: test_set_result_entity
+- changeSet:
+    id: 1776261247546-26
+    author: mavor (generated)
+    changes:
+    - createTable:
+        columns:
+        - column:
+            constraints:
+              nullable: false
+            name: instruction_type
+            type: varchar(31)
+        - column:
+            autoIncrement: true
+            constraints:
+              nullable: false
+              primaryKey: true
+            name: id
+            type: bigint
+        - column:
+            name: default_value
+            type: varchar(255)
+        - column:
+            name: variable_name
+            type: varchar(255)
+        - column:
+            name: fixed_value
+            type: varchar(255)
+        - column:
+            name: char_pool
+            type: varchar(255)
+        - column:
+            name: prefix
+            type: varchar(255)
+        - column:
+            name: random_string_length
+            type: int
+        - column:
+            name: suffix
+            type: varchar(255)
+        - column:
+            name: format_pattern
+            type: varchar(255)
+        - column:
+            name: offset_days
+            type: int
+        tableName: value_computation_instruction_entity
+- changeSet:
+    id: 1776261247546-27
+    author: mavor (generated)
+    changes:
+    - createIndex:
+        associatedWith: ''
+        columns:
+        - column:
+            name: action_entity_id
+        indexName: FK68aslvk9x7yjqimy2s8xtoby2
+        tableName: action_entity_next_actions
+- changeSet:
+    id: 1776261247546-28
+    author: mavor (generated)
+    changes:
+    - createIndex:
+        associatedWith: ''
+        columns:
+        - column:
+            name: test_plan_entity_id
+        indexName: FKchb9lw83376bbqj7wdpai9ywi
+        tableName: test_plan_entity_test_steps
+- changeSet:
+    id: 1776261247546-29
+    author: mavor (generated)
+    changes:
+    - createIndex:
+        associatedWith: ''
+        columns:
+        - column:
+            name: test_case_result_entity_id
+        indexName: FKm0eooe8yc5m0lx4b78a0bjaxy
+        tableName: test_case_result_entity_results
+- changeSet:
+    id: 1776261247546-30
+    author: mavor (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: value_computation_id
+        baseTableName: action_details_entity
+        constraintName: FK2idcr7r4hw10mt0fo0w3a860h
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: id
+        referencedTableName: value_computation_instruction_entity
+        validate: true
+- changeSet:
+    id: 1776261247546-31
+    author: mavor (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: action_entity_id
+        baseTableName: action_entity_next_actions
+        constraintName: FK68aslvk9x7yjqimy2s8xtoby2
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: id
+        referencedTableName: action_entity
+        validate: true
+- changeSet:
+    id: 1776261247546-32
+    author: mavor (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: test_plan_entity_id
+        baseTableName: test_plan_entity_test_steps
+        constraintName: FKchb9lw83376bbqj7wdpai9ywi
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: id
+        referencedTableName: test_plan_entity
+        validate: true
+- changeSet:
+    id: 1776261247546-33
+    author: mavor (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: details_id
+        baseTableName: action_entity
+        constraintName: FKdup0h2wyelbwqwjx0q09ve5vv
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: id
+        referencedTableName: action_details_entity
+        validate: true
+- changeSet:
+    id: 1776261247546-34
+    author: mavor (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: position_id
+        baseTableName: action_entity
+        constraintName: FKecd2hr1os2ywd5j9qwrsftdi4
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: id
+        referencedTableName: position_entity
+        validate: true
+- changeSet:
+    id: 1776261247546-35
+    author: mavor (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: test_case_result_entity_id
+        baseTableName: test_case_result_entity_results
+        constraintName: FKm0eooe8yc5m0lx4b78a0bjaxy
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: id
+        referencedTableName: test_case_result_entity
+        validate: true
+- changeSet:
+    id: 1776261247546-36
+    author: mavor (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: results_id
+        baseTableName: test_case_result_entity_results
+        constraintName: FKnetjrh3mglw5wsojp6rftb617
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: id
+        referencedTableName: test_path_result_entity
+        validate: true
+- changeSet:
+    id: 1776261247546-37
+    author: mavor (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: test_steps_id
+        baseTableName: test_plan_entity_test_steps
+        constraintName: FKq76es3dir7v9s7tqq0emrnd4
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: id
+        referencedTableName: action_entity
+        validate: true
+- changeSet:
+    id: 1776261247546-38
+    author: mavor (generated)
+    changes:
+    - addForeignKeyConstraint:
+        baseColumnNames: test_case_result_id
+        baseTableName: test_set_result_entity
+        constraintName: FKt2s8dpqnolg5d2b2gv017s0ud
+        deferrable: false
+        initiallyDeferred: false
+        onDelete: RESTRICT
+        onUpdate: RESTRICT
+        referencedColumnNames: id
+        referencedTableName: test_case_result_entity
+        validate: true
+

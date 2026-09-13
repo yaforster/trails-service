@@ -1,0 +1,1616 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <title>Controller CRUD Demo</title>
+    <style>
+        :root {
+            --bg: #f5f7fb;
+            --panel: #ffffff;
+            --text: #17202c;
+            --muted: #5f6b7a;
+            --accent: #0a6cff;
+            --accent-strong: #1153bb;
+            --border: #d7deea;
+            --surface: #f8fbff;
+            --success: #16794d;
+            --warn: #9a3d00;
+            --danger: #b42318;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(120deg, #eef4ff 0%, #fbfdff 58%, #eef8f5 100%);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .wrap {
+            width: 100%;
+            min-height: 100vh;
+            padding: 14px;
+        }
+
+        .shell {
+            min-height: calc(100vh - 28px);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--panel);
+            box-shadow: 0 8px 20px rgba(24, 32, 42, 0.06);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .topbar {
+            display: flex;
+            gap: 12px;
+            align-items: end;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .heading {
+            min-width: 260px;
+        }
+
+        .hub-link {
+            display: inline-flex;
+            width: fit-content;
+            margin-bottom: 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 8px 11px;
+            background: #eef3fc;
+            color: #23324a;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        h1 {
+            margin: 0 0 6px;
+            font-size: 1.35rem;
+        }
+
+        p {
+            margin: 0;
+            color: var(--muted);
+        }
+
+        label {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-width: 190px;
+            font-size: 0.88rem;
+            color: #26364e;
+        }
+
+        input, select, button {
+            min-height: 40px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 9px 11px;
+            font: inherit;
+        }
+
+        input[type="file"] {
+            padding: 7px 9px;
+        }
+
+        button {
+            border: 0;
+            background: var(--accent);
+            color: #ffffff;
+            font-weight: 650;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        button:hover {
+            background: var(--accent-strong);
+        }
+
+        button.secondary {
+            border: 1px solid var(--border);
+            background: #eef3fc;
+            color: #23324a;
+        }
+
+        button.secondary:hover {
+            background: #dfe9fb;
+        }
+
+        button.danger {
+            background: var(--danger);
+        }
+
+        button.danger:hover {
+            background: #8f1d13;
+        }
+
+        .base-controls {
+            display: flex;
+            gap: 10px;
+            align-items: end;
+            flex-wrap: wrap;
+        }
+
+        .base-controls label {
+            min-width: min(520px, 100%);
+        }
+
+        .status {
+            min-height: 22px;
+            font-size: 0.92rem;
+            color: var(--muted);
+        }
+
+        .status.success {
+            color: var(--success);
+        }
+
+        .status.warn {
+            color: var(--warn);
+        }
+
+        .status.error {
+            color: var(--danger);
+        }
+
+        .workbench {
+            display: grid;
+            grid-template-columns: minmax(340px, 0.95fr) minmax(520px, 1.55fr);
+            gap: 14px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .resource-browser,
+        .workspace {
+            min-width: 0;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .resource-browser {
+            overflow: auto;
+            padding-right: 2px;
+        }
+
+        .section {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--surface);
+            padding: 12px;
+        }
+
+        .section h2 {
+            margin: 0 0 10px;
+            font-size: 1rem;
+        }
+
+        .section-row {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            align-items: start;
+        }
+
+        .tabbar {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+        }
+
+        .tabbar button {
+            border: 1px solid var(--border);
+            background: #eef3fc;
+            color: #23324a;
+        }
+
+        .tabbar button.active {
+            border-color: var(--accent);
+            background: var(--accent);
+            color: #ffffff;
+        }
+
+        .tab-panel {
+            display: none;
+            min-height: 0;
+        }
+
+        .tab-panel.active {
+            display: grid;
+            gap: 12px;
+        }
+
+        .response-panel.active {
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            align-items: end;
+        }
+
+        .form-grid .span {
+            grid-column: 1 / -1;
+        }
+
+        .list-actions {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+        }
+
+        .inline-check {
+            min-width: auto;
+            flex-direction: row;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .inline-check input {
+            min-height: auto;
+        }
+
+        .resource-list {
+            display: grid;
+            gap: 8px;
+            max-height: 260px;
+            overflow: auto;
+            padding-right: 2px;
+        }
+
+        .resource-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 8px;
+            align-items: center;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #ffffff;
+            padding: 9px;
+        }
+
+        .row-actions {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .resource-title {
+            font-weight: 650;
+            overflow-wrap: anywhere;
+        }
+
+        .resource-meta {
+            margin-top: 2px;
+            color: var(--muted);
+            font-size: 0.83rem;
+            overflow-wrap: anywhere;
+        }
+
+        .empty {
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        pre {
+            margin: 0;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #0b1220;
+            color: #d8e4ff;
+            padding: 12px;
+            min-height: 360px;
+            flex: 1;
+            overflow: auto;
+            overflow-wrap: anywhere;
+            word-break: break-word;
+            font-size: 0.84rem;
+            line-height: 1.45;
+        }
+
+        .response-panel pre {
+            min-height: 520px;
+        }
+
+        .preview {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: #ffffff;
+            min-height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .preview img {
+            display: block;
+            max-width: 100%;
+            max-height: 260px;
+        }
+
+        .token-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+            align-items: end;
+        }
+
+        .token-grid .wide {
+            grid-column: 1 / -1;
+        }
+
+        .token-grid textarea {
+            width: 100%;
+            min-height: 86px;
+            resize: vertical;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 9px 11px;
+            font: 0.82rem Consolas, "Courier New", monospace;
+        }
+
+        @media (max-width: 1180px) {
+            .workbench {
+                grid-template-columns: 1fr;
+            }
+
+            .resource-list {
+                max-height: 220px;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .form-grid,
+            .section-row {
+                grid-template-columns: 1fr;
+            }
+
+            .token-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <main class="shell">
+        <div class="topbar">
+            <div class="heading">
+                <a class="hub-link" href="index.html">&larr; Back to Demo Hub</a>
+                <h1>Controller CRUD Demo</h1>
+                <p>Create, inspect, update, and delete controller-managed resources.</p>
+            </div>
+            <div class="base-controls">
+                <label>
+                    Base URL
+                    <input id="baseUrl" type="text">
+                </label>
+                <button id="refreshAllBtn" class="secondary" type="button">Refresh Lists</button>
+            </div>
+        </div>
+
+        <div class="status" id="status">Idle</div>
+
+        <div class="workbench">
+            <aside class="resource-browser">
+                <section class="section">
+                    <h2>Applications</h2>
+                    <div class="list-actions">
+                        <button id="loadApplicationsBtn" class="secondary" type="button">Load Applications</button>
+                        <label class="inline-check">
+                            <input id="includeRetiredApplications" type="checkbox">
+                            Include retired
+                        </label>
+                    </div>
+                    <div id="applicationsList" class="resource-list">
+                        <div class="empty">No applications loaded.</div>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <h2>Stages</h2>
+                    <div class="list-actions">
+                        <label>
+                            Application ID
+                            <input id="listStagesApplicationId" min="1" step="1" type="number">
+                        </label>
+                        <button id="loadStagesBtn" class="secondary" type="button">Load Stages</button>
+                        <label class="inline-check">
+                            <input id="includeRetiredStages" type="checkbox">
+                            Include retired
+                        </label>
+                    </div>
+                    <div id="stagesList" class="resource-list">
+                        <div class="empty">Select an application to load stages.</div>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <h2>Elements</h2>
+                    <div class="list-actions">
+                        <label>
+                            Application ID
+                            <input id="listElementsApplicationId" min="1" step="1" type="number">
+                        </label>
+                        <label>
+                            Stage ID
+                            <input id="listElementsStageId" min="1" step="1" type="number">
+                        </label>
+                        <label>
+                            Target Stage ID
+                            <input id="promoteElementsTargetStageId" min="1" step="1" type="number">
+                        </label>
+                        <button id="loadElementsBtn" class="secondary" type="button">Load Elements</button>
+                        <label class="inline-check">
+                            <input id="includeRetiredElements" type="checkbox">
+                            Include retired
+                        </label>
+                    </div>
+                    <div id="elementsList" class="resource-list">
+                        <div class="empty">Select a stage to load elements.</div>
+                    </div>
+                </section>
+
+                <section class="section">
+                    <h2>Test Plans</h2>
+                    <div class="list-actions">
+                        <label>
+                            Application ID
+                            <input id="listTestPlansApplicationId" min="1" step="1" type="number">
+                        </label>
+                        <label>
+                            Stage ID
+                            <input id="listTestPlansStageId" min="1" step="1" type="number">
+                        </label>
+                        <label>
+                            Target Stage ID
+                            <input id="promoteTestPlansTargetStageId" min="1" step="1" type="number">
+                        </label>
+                        <button id="loadTestPlansBtn" class="secondary" type="button">Load Test Plans</button>
+                        <label class="inline-check">
+                            <input id="includeRetiredTestPlans" type="checkbox">
+                            Include retired
+                        </label>
+                    </div>
+                    <div id="testPlansList" class="resource-list">
+                        <div class="empty">Select a stage to load test plans.</div>
+                    </div>
+                </section>
+            </aside>
+
+            <section class="workspace">
+                <div class="tabbar" role="tablist" aria-label="CRUD demo sections">
+                    <button class="active" type="button" role="tab" aria-selected="true" data-tab="createPanel">Create</button>
+                    <button type="button" role="tab" aria-selected="false" data-tab="mediaPanel">Media & Profile</button>
+                    <button type="button" role="tab" aria-selected="false" data-tab="authPanel">Auth & Deployment</button>
+                    <button type="button" role="tab" aria-selected="false" data-tab="responsePanel">Response</button>
+                </div>
+
+                <div id="createPanel" class="tab-panel active" role="tabpanel">
+                    <div class="section-row">
+                <section class="section">
+                    <h2>Create Application</h2>
+                    <form id="applicationForm" class="form-grid">
+                        <label class="span">
+                            Label
+                            <input id="applicationLabel" autocomplete="off" required type="text" value="Demo Application">
+                        </label>
+                        <button class="span" type="submit">Create Application</button>
+                    </form>
+                </section>
+
+                <section class="section">
+                    <h2>Create Stage</h2>
+                    <form id="stageForm" class="form-grid">
+                        <label>
+                            Application ID
+                            <input id="stageApplicationId" min="1" required step="1" type="number">
+                        </label>
+                        <label>
+                            Label
+                            <input id="stageLabel" autocomplete="off" required type="text" value="Local Stage">
+                        </label>
+                        <label class="span">
+                            URL
+                            <input id="stageUrl" autocomplete="off" required type="url" value="http://localhost:8080/dummy.html">
+                        </label>
+                        <button class="span" type="submit">Create Stage</button>
+                    </form>
+                </section>
+                    </div>
+
+                    <div class="section-row">
+                <section class="section">
+                    <h2>Create Element</h2>
+                    <form id="elementForm" class="form-grid">
+                        <label>
+                            Application ID
+                            <input id="elementApplicationId" min="1" required step="1" type="number">
+                        </label>
+                        <label>
+                            Stage ID
+                            <input id="elementStageId" min="1" required step="1" type="number">
+                        </label>
+                        <label>
+                            Label
+                            <input id="elementLabel" autocomplete="off" required type="text" value="Login Button">
+                        </label>
+                        <label>
+                            Element Type
+                            <select id="elementType">
+                                <option>BUTTON</option>
+                                <option>INPUT</option>
+                                <option>TEXT</option>
+                                <option>SELECT</option>
+                                <option>RADIO</option>
+                                <option>CHECKBOX</option>
+                                <option>COLORPICKER</option>
+                                <option>DATEPICKER</option>
+                                <option>DATETIMEPICKER</option>
+                                <option>FILEUPLOAD</option>
+                                <option>RANGE</option>
+                                <option>TIME</option>
+                                <option>WEEK</option>
+                            </select>
+                        </label>
+                        <label>
+                            Locator Type
+                            <select id="locatorType">
+                                <option>CSS</option>
+                                <option>XPATH</option>
+                            </select>
+                        </label>
+                        <label>
+                            Locator
+                            <input id="locatorString" autocomplete="off" required type="text" value="#login">
+                        </label>
+                        <button class="span" type="submit">Create Element</button>
+                    </form>
+                </section>
+
+                <section class="section">
+                    <h2>Upload Screenshot</h2>
+                    <form id="screenshotForm" class="form-grid">
+                        <label>
+                            Application ID
+                            <input id="screenshotApplicationId" min="1" required step="1" type="number">
+                        </label>
+                        <label>
+                            Stage ID
+                            <input id="screenshotStageId" min="1" required step="1" type="number">
+                        </label>
+                        <label>
+                            Element ID
+                            <input id="screenshotElementId" min="1" required step="1" type="number">
+                        </label>
+                        <label>
+                            Image file
+                            <input id="screenshotFile" accept="image/png,image/jpeg,image/gif,image/bmp,image/webp" required type="file">
+                        </label>
+                        <button class="span" type="submit">Upload Screenshot</button>
+                    </form>
+                </section>
+                    </div>
+                </div>
+
+                <div id="mediaPanel" class="tab-panel" role="tabpanel">
+                    <div class="section-row">
+                <section class="section">
+                    <h2>User Profile</h2>
+                    <form id="profileForm" class="form-grid">
+                        <label>
+                            First Name
+                            <input id="profileFirstName" autocomplete="given-name" type="text">
+                        </label>
+                        <label>
+                            Last Name
+                            <input id="profileLastName" autocomplete="family-name" type="text">
+                        </label>
+                        <label>
+                            Email
+                            <input id="profileEmail" autocomplete="email" type="email">
+                        </label>
+                        <label>
+                            Phone
+                            <input id="profilePhoneNumber" autocomplete="tel" type="tel">
+                        </label>
+                        <button id="loadProfileBtn" class="secondary" type="button">Load Profile</button>
+                        <button type="submit">Update Profile</button>
+                    </form>
+                </section>
+
+                <section class="section">
+                    <h2>Profile Picture</h2>
+                    <form id="profilePictureForm" class="form-grid">
+                        <label class="span">
+                            Image file
+                            <input id="profilePictureFile" accept="image/png,image/jpeg,image/gif,image/bmp,image/webp" type="file">
+                        </label>
+                        <button id="loadProfilePictureBtn" class="secondary" type="button">Load Avatar</button>
+                        <button type="submit">Upload Avatar</button>
+                        <button id="deleteProfilePictureBtn" class="danger span" type="button">Delete Avatar</button>
+                    </form>
+                    <div class="preview" id="profilePicturePreview">
+                        <span class="empty">No profile picture loaded.</span>
+                    </div>
+                </section>
+                    </div>
+
+                    <section class="section">
+                        <h2>Screenshot Preview</h2>
+                        <div class="preview" id="screenshotPreview">
+                            <span class="empty">Select an element with a screenshot link.</span>
+                        </div>
+                    </section>
+                </div>
+
+                <div id="authPanel" class="tab-panel" role="tabpanel">
+                <section class="section">
+                    <h2>Keycloak Token</h2>
+                    <form id="tokenForm" class="token-grid">
+                        <label>
+                            Keycloak URL
+                            <input id="keycloakBaseUrl" name="keycloakBaseUrl" type="url" value="http://localhost:8081">
+                        </label>
+                        <label>
+                            Realm
+                            <input id="keycloakRealm" name="keycloakRealm" type="text" value="master">
+                        </label>
+                        <label>
+                            Client ID
+                            <input id="keycloakClientId" name="keycloakClientId" type="text">
+                        </label>
+                        <label>
+                            Client Secret
+                            <input id="keycloakClientSecret" name="keycloakClientSecret" type="password">
+                        </label>
+                        <label>
+                            Username
+                            <input id="keycloakUsername" name="keycloakUsername" type="text" autocomplete="username">
+                        </label>
+                        <label>
+                            Password
+                            <input id="keycloakPassword" name="keycloakPassword" type="password" autocomplete="current-password">
+                        </label>
+                        <button type="submit">Fetch Token</button>
+                        <button id="clearTokenBtn" class="secondary" type="button">Clear Token</button>
+                        <label class="wide">
+                            Access Token
+                            <textarea id="accessToken" spellcheck="false"></textarea>
+                        </label>
+                    </form>
+                </section>
+
+                <section class="section">
+                    <h2>Report Deployment</h2>
+                    <form id="deploymentForm" class="form-grid">
+                        <label>
+                            Application ID
+                            <input id="deploymentApplicationId" min="1" step="1" type="number">
+                        </label>
+                        <label>
+                            Stage ID
+                            <input id="deploymentStageId" min="1" step="1" type="number">
+                        </label>
+                        <label class="span">
+                            Version
+                            <input id="deploymentVersion" type="text">
+                        </label>
+                        <label class="span">
+                            Deployed At
+                            <input id="deploymentDeployedAt" type="datetime-local">
+                        </label>
+                        <button class="span" type="submit">Report Deployment</button>
+                    </form>
+                </section>
+                </div>
+
+                <section id="responsePanel" class="section response-panel tab-panel" role="tabpanel">
+                    <h2>Last Response</h2>
+                    <pre id="responseViewer">No request sent yet.</pre>
+                </section>
+            </section>
+        </div>
+    </main>
+</div>
+
+<script>
+    const baseUrlInput = document.getElementById("baseUrl");
+    const statusEl = document.getElementById("status");
+    const responseViewerEl = document.getElementById("responseViewer");
+    const applicationsListEl = document.getElementById("applicationsList");
+    const stagesListEl = document.getElementById("stagesList");
+    const elementsListEl = document.getElementById("elementsList");
+    const testPlansListEl = document.getElementById("testPlansList");
+    const screenshotPreviewEl = document.getElementById("screenshotPreview");
+    const profilePicturePreviewEl = document.getElementById("profilePicturePreview");
+
+    const applicationForm = document.getElementById("applicationForm");
+    const stageForm = document.getElementById("stageForm");
+    const elementForm = document.getElementById("elementForm");
+    const screenshotForm = document.getElementById("screenshotForm");
+    const tokenForm = document.getElementById("tokenForm");
+    const deploymentForm = document.getElementById("deploymentForm");
+    const profileForm = document.getElementById("profileForm");
+    const profilePictureForm = document.getElementById("profilePictureForm");
+
+    const applicationLabelInput = document.getElementById("applicationLabel");
+    const stageApplicationIdInput = document.getElementById("stageApplicationId");
+    const stageLabelInput = document.getElementById("stageLabel");
+    const stageUrlInput = document.getElementById("stageUrl");
+    const elementApplicationIdInput = document.getElementById("elementApplicationId");
+    const elementStageIdInput = document.getElementById("elementStageId");
+    const elementLabelInput = document.getElementById("elementLabel");
+    const elementTypeInput = document.getElementById("elementType");
+    const locatorTypeInput = document.getElementById("locatorType");
+    const locatorStringInput = document.getElementById("locatorString");
+    const screenshotApplicationIdInput = document.getElementById("screenshotApplicationId");
+    const screenshotStageIdInput = document.getElementById("screenshotStageId");
+    const screenshotElementIdInput = document.getElementById("screenshotElementId");
+    const screenshotFileInput = document.getElementById("screenshotFile");
+    const accessTokenInput = document.getElementById("accessToken");
+    const deploymentApplicationIdInput = document.getElementById("deploymentApplicationId");
+    const deploymentStageIdInput = document.getElementById("deploymentStageId");
+    const deploymentVersionInput = document.getElementById("deploymentVersion");
+    const deploymentDeployedAtInput = document.getElementById("deploymentDeployedAt");
+    const profileFirstNameInput = document.getElementById("profileFirstName");
+    const profileLastNameInput = document.getElementById("profileLastName");
+    const profileEmailInput = document.getElementById("profileEmail");
+    const profilePhoneNumberInput = document.getElementById("profilePhoneNumber");
+    const profilePictureFileInput = document.getElementById("profilePictureFile");
+    const listStagesApplicationIdInput = document.getElementById("listStagesApplicationId");
+    const listElementsApplicationIdInput = document.getElementById("listElementsApplicationId");
+    const listElementsStageIdInput = document.getElementById("listElementsStageId");
+    const listTestPlansApplicationIdInput = document.getElementById("listTestPlansApplicationId");
+    const listTestPlansStageIdInput = document.getElementById("listTestPlansStageId");
+    const promoteElementsTargetStageIdInput = document.getElementById("promoteElementsTargetStageId");
+    const promoteTestPlansTargetStageIdInput = document.getElementById("promoteTestPlansTargetStageId");
+    const includeRetiredApplicationsInput = document.getElementById("includeRetiredApplications");
+    const includeRetiredStagesInput = document.getElementById("includeRetiredStages");
+    const includeRetiredElementsInput = document.getElementById("includeRetiredElements");
+    const includeRetiredTestPlansInput = document.getElementById("includeRetiredTestPlans");
+    const tabButtons = Array.from(document.querySelectorAll(".tabbar button[data-tab]"));
+    const tabPanels = Array.from(document.querySelectorAll(".tab-panel"));
+
+    function normalizeBaseUrl() {
+        return baseUrlInput.value.trim().replace(/\/+$/, "");
+    }
+
+    function apiUrl(path) {
+        return normalizeBaseUrl() + path;
+    }
+
+    function setStatus(message, mode) {
+        statusEl.textContent = message;
+        statusEl.className = mode ? "status " + mode : "status";
+    }
+
+    function pretty(value) {
+        return JSON.stringify(value, null, 2);
+    }
+
+    function showResponse(method, url, status, payload) {
+        responseViewerEl.textContent = pretty({method, url, status, payload});
+    }
+
+    function authHeaders(extraHeaders) {
+        const headers = Object.assign({}, extraHeaders || {});
+        const token = accessTokenInput.value.trim();
+        if (token) {
+            headers.Authorization = "Bearer " + token;
+        }
+        return headers;
+    }
+
+    function activateTab(panelId) {
+        tabButtons.forEach((button) => {
+            const active = button.dataset.tab === panelId;
+            button.classList.toggle("active", active);
+            button.setAttribute("aria-selected", active ? "true" : "false");
+        });
+        tabPanels.forEach((panel) => {
+            panel.classList.toggle("active", panel.id === panelId);
+        });
+    }
+
+    function toIsoDateTime(localDateTimeValue) {
+        if (!localDateTimeValue) {
+            throw new Error("Provide a deployment timestamp.");
+        }
+        const date = new Date(localDateTimeValue);
+        if (Number.isNaN(date.getTime())) {
+            throw new Error("Provide a valid deployment timestamp.");
+        }
+        return date.toISOString();
+    }
+
+    async function parseResponse(response) {
+        const contentType = response.headers.get("content-type") || "";
+        if (contentType.includes("application/json")) {
+            return response.json();
+        }
+        return response.text();
+    }
+
+    async function sendJson(method, path, body) {
+        const url = apiUrl(path);
+        setStatus(method + " " + path, null);
+        const response = await fetch(url, {
+            method,
+            headers: authHeaders({
+                "Accept": "application/json",
+                "Content-Type": "application/json"
+            }),
+            body: JSON.stringify(body)
+        });
+        const payload = await parseResponse(response);
+        showResponse(method, url, response.status, payload);
+        if (!response.ok) {
+            setStatus("Request failed with HTTP " + response.status + ".", "error");
+            return null;
+        }
+        setStatus("Request completed with HTTP " + response.status + ".", "success");
+        return payload;
+    }
+
+    async function getJson(path) {
+        const url = apiUrl(path);
+        setStatus("GET " + path, null);
+        const response = await fetch(url, {
+            method: "GET",
+            headers: authHeaders({"Accept": "application/json"})
+        });
+        const payload = await parseResponse(response);
+        showResponse("GET", url, response.status, payload);
+        if (!response.ok) {
+            setStatus("Request failed with HTTP " + response.status + ".", "error");
+            return null;
+        }
+        setStatus("Loaded " + path + ".", "success");
+        return payload;
+    }
+
+    function payloadItems(payload) {
+        if (!payload || typeof payload !== "object") {
+            return [];
+        }
+        if (Array.isArray(payload.items)) {
+            return payload.items;
+        }
+        if (payload._embedded && typeof payload._embedded === "object") {
+            return Object.values(payload._embedded).find(Array.isArray) || [];
+        }
+        return [];
+    }
+
+    async function deleteResource(path, successMessage, afterDelete) {
+        if (!confirm("Delete this resource?")) {
+            return null;
+        }
+        const url = apiUrl(path);
+        setStatus("DELETE " + path, null);
+        const response = await fetch(url, {
+            method: "DELETE",
+            headers: authHeaders({"Accept": "application/json"})
+        });
+        const payload = await parseResponse(response);
+        showResponse("DELETE", url, response.status, payload);
+        if (!response.ok) {
+            setStatus("Delete failed with HTTP " + response.status + ".", "error");
+            return null;
+        }
+        setStatus(successMessage || "Delete completed with HTTP " + response.status + ".", "success");
+        if (afterDelete) {
+            await afterDelete(payload);
+        }
+        return payload;
+    }
+
+    async function restoreResource(path, successMessage, afterRestore) {
+        const url = apiUrl(path);
+        setStatus("POST " + path, null);
+        const response = await fetch(url, {
+            method: "POST",
+            headers: authHeaders({"Accept": "application/json"})
+        });
+        const payload = await parseResponse(response);
+        showResponse("POST", url, response.status, payload);
+        if (!response.ok) {
+            setStatus("Restore failed with HTTP " + response.status + ".", "error");
+            return null;
+        }
+        setStatus(successMessage || "Restore completed with HTTP " + response.status + ".", "success");
+        if (afterRestore) {
+            await afterRestore(payload);
+        }
+        return payload;
+    }
+
+    async function promoteResource(path, successMessage, afterPromote) {
+        const url = apiUrl(path);
+        setStatus("POST " + path, null);
+        const response = await fetch(url, {
+            method: "POST",
+            headers: authHeaders({"Accept": "application/json"})
+        });
+        const payload = await parseResponse(response);
+        showResponse("POST", url, response.status, payload);
+        if (!response.ok) {
+            setStatus("Promote failed with HTTP " + response.status + ".", "error");
+            return null;
+        }
+        setStatus(successMessage || "Promote completed with HTTP " + response.status + ".", "success");
+        if (afterPromote) {
+            await afterPromote(payload);
+        }
+        return payload;
+    }
+
+    function includeRetiredQuery(input) {
+        return input.checked ? "&includeRetired=true" : "";
+    }
+
+    function retirementMeta(resource, baseMeta) {
+        return baseMeta + (resource.retired ? " | retired" : "");
+    }
+
+    function restorePath(resource, fallbackPath) {
+        return relationPath(resource, "restore", fallbackPath);
+    }
+
+    function promotePath(resource, fallbackPath, targetStageId) {
+        const path = relationPath(resource, "promote", fallbackPath);
+        if (path.includes("{?targetStageId}")) {
+            return path.replace("{?targetStageId}", "?targetStageId=" + targetStageId);
+        }
+        if (path.includes("{targetStageId}")) {
+            return path.replace("{targetStageId}", targetStageId);
+        }
+        return path + (path.includes("?") ? "&" : "?") + "targetStageId=" + targetStageId;
+    }
+
+    function relationPath(resource, rel, fallbackPath) {
+        const href = findLink(resource, rel);
+        if (!href) {
+            return fallbackPath;
+        }
+        const base = normalizeBaseUrl();
+        if (href.startsWith(base)) {
+            return href.slice(base.length);
+        }
+        if (href.startsWith("/")) {
+            return href;
+        }
+        try {
+            const url = new URL(href);
+            return url.pathname + url.search;
+        } catch (error) {
+            return fallbackPath;
+        }
+    }
+
+    function readTargetStageId(input, entityName) {
+        const value = Number.parseInt(input.value, 10);
+        if (!Number.isInteger(value) || value <= 0) {
+            setStatus("Provide a target stage ID to promote " + entityName + ".", "warn");
+            return null;
+        }
+        return value;
+    }
+
+    function clearList(container, message) {
+        container.innerHTML = "";
+        const empty = document.createElement("div");
+        empty.className = "empty";
+        empty.textContent = message;
+        container.appendChild(empty);
+    }
+
+    function createRow(title, meta, actions) {
+        const row = document.createElement("div");
+        row.className = "resource-row";
+
+        const text = document.createElement("div");
+        const titleEl = document.createElement("div");
+        titleEl.className = "resource-title";
+        titleEl.textContent = title;
+        const metaEl = document.createElement("div");
+        metaEl.className = "resource-meta";
+        metaEl.textContent = meta;
+        text.append(titleEl, metaEl);
+
+        const actionWrap = document.createElement("div");
+        actionWrap.className = "row-actions";
+        actions.forEach((action) => {
+            const button = document.createElement("button");
+            button.type = "button";
+            button.className = action.className || "secondary";
+            button.textContent = action.label;
+            button.addEventListener("click", action.handler);
+            actionWrap.appendChild(button);
+        });
+
+        row.append(text, actionWrap);
+        return row;
+    }
+
+    function selectApplication(id) {
+        stageApplicationIdInput.value = id;
+        elementApplicationIdInput.value = id;
+        screenshotApplicationIdInput.value = id;
+        deploymentApplicationIdInput.value = id;
+        listStagesApplicationIdInput.value = id;
+        listElementsApplicationIdInput.value = id;
+        listTestPlansApplicationIdInput.value = id;
+        loadStages();
+    }
+
+    function selectStage(applicationId, stageId) {
+        elementApplicationIdInput.value = applicationId;
+        elementStageIdInput.value = stageId;
+        screenshotApplicationIdInput.value = applicationId;
+        screenshotStageIdInput.value = stageId;
+        deploymentApplicationIdInput.value = applicationId;
+        deploymentStageIdInput.value = stageId;
+        listElementsApplicationIdInput.value = applicationId;
+        listElementsStageIdInput.value = stageId;
+        listTestPlansApplicationIdInput.value = applicationId;
+        listTestPlansStageIdInput.value = stageId;
+        loadElements();
+        loadTestPlans();
+    }
+
+    function selectElement(applicationId, stageId, elementId, payload) {
+        screenshotApplicationIdInput.value = applicationId;
+        screenshotStageIdInput.value = stageId;
+        screenshotElementIdInput.value = elementId;
+        renderScreenshotPreview(applicationId, stageId, elementId, payload);
+        activateTab("mediaPanel");
+    }
+
+    function findLink(payload, rel) {
+        const links = payload && (payload._links || payload.links);
+        const descriptor = links && links[rel];
+        if (!descriptor) {
+            return null;
+        }
+        if (Array.isArray(descriptor)) {
+            const first = descriptor.find((entry) => entry && entry.href);
+            return first ? first.href : null;
+        }
+        return descriptor.href || null;
+    }
+
+    function renderScreenshotPreview(applicationId, stageId, elementId, payload) {
+        const path = "/api/applications/" + applicationId + "/stages/" + stageId + "/elements/" + elementId + "/screenshot";
+        const href = findLink(payload, "screenshot") || path;
+        renderImagePreview(screenshotPreviewEl, href, "Element screenshot preview",
+            "No screenshot available for this element.");
+    }
+
+    async function renderImagePreview(container, href, alt, emptyMessage) {
+        container.innerHTML = "";
+        const absoluteUrl = new URL(href, normalizeBaseUrl() + "/").toString();
+        const img = document.createElement("img");
+        img.alt = alt;
+        img.addEventListener("error", () => {
+            container.innerHTML = "";
+            const empty = document.createElement("span");
+            empty.className = "empty";
+            empty.textContent = emptyMessage;
+            container.appendChild(empty);
+        });
+        container.appendChild(img);
+        if (!accessTokenInput.value.trim()) {
+            img.src = absoluteUrl + "?t=" + Date.now();
+            return;
+        }
+        const response = await fetch(absoluteUrl, {
+            method: "GET",
+            headers: authHeaders()
+        });
+        if (!response.ok) {
+            img.dispatchEvent(new Event("error"));
+            return;
+        }
+        img.src = URL.createObjectURL(await response.blob());
+    }
+
+    async function loadApplications() {
+        const payload = await getJson("/api/applications?page=0&size=50" +
+            includeRetiredQuery(includeRetiredApplicationsInput));
+        const applications = payloadItems(payload);
+        applicationsListEl.innerHTML = "";
+        if (applications.length === 0) {
+            clearList(applicationsListEl, "No applications found.");
+            return;
+        }
+        applications.forEach((application) => {
+            const actions = [
+                {label: "Select", handler: () => selectApplication(application.id)}
+            ];
+            if (application.retired) {
+                actions.push({
+                    label: "Restore",
+                    handler: () => restoreResource(
+                        restorePath(application, "/api/applications/" + application.id + "/restore"),
+                        "Application restore requested.",
+                        loadApplications)
+                });
+            } else {
+                actions.push({
+                    label: "Delete",
+                    className: "danger",
+                    handler: () => deleteResource("/api/applications/" + application.id,
+                        "Application delete requested.", loadApplications)
+                });
+            }
+            applicationsListEl.appendChild(createRow(
+                application.label || "Application #" + application.id,
+                retirementMeta(application, "id=" + application.id),
+                actions
+            ));
+        });
+    }
+
+    async function loadStages() {
+        const applicationId = Number.parseInt(listStagesApplicationIdInput.value, 10);
+        if (!Number.isInteger(applicationId) || applicationId <= 0) {
+            setStatus("Provide an application ID to load stages.", "warn");
+            return;
+        }
+        const payload = await getJson("/api/applications/" + applicationId + "/stages?page=0&size=50" +
+            includeRetiredQuery(includeRetiredStagesInput));
+        const stages = payloadItems(payload);
+        stagesListEl.innerHTML = "";
+        if (stages.length === 0) {
+            clearList(stagesListEl, "No stages found for application " + applicationId + ".");
+            return;
+        }
+        stages.forEach((stage) => {
+            const actions = [
+                {label: "Select", handler: () => selectStage(applicationId, stage.id)}
+            ];
+            if (stage.retired) {
+                actions.push({
+                    label: "Restore",
+                    handler: () => restoreResource(
+                        restorePath(stage,
+                            "/api/applications/" + applicationId + "/stages/" + stage.id + "/restore"),
+                        "Stage restore requested.",
+                        loadStages)
+                });
+            } else {
+                actions.push({
+                    label: "Delete",
+                    className: "danger",
+                    handler: () => deleteResource(
+                        "/api/applications/" + applicationId + "/stages/" + stage.id,
+                        "Stage delete requested.",
+                        async () => {
+                            await loadStages();
+                            clearList(elementsListEl, "Select a stage to load elements.");
+                            clearList(testPlansListEl, "Select a stage to load test plans.");
+                        })
+                });
+            }
+            stagesListEl.appendChild(createRow(
+                stage.label || "Stage #" + stage.id,
+                retirementMeta(stage, "id=" + stage.id + (stage.url ? " | " + stage.url : "")),
+                actions
+            ));
+        });
+    }
+
+    async function loadElements() {
+        const applicationId = Number.parseInt(listElementsApplicationIdInput.value, 10);
+        const stageId = Number.parseInt(listElementsStageIdInput.value, 10);
+        if (!Number.isInteger(applicationId) || applicationId <= 0 ||
+            !Number.isInteger(stageId) || stageId <= 0) {
+            setStatus("Provide application and stage IDs to load elements.", "warn");
+            return;
+        }
+        const payload = await getJson("/api/applications/" + applicationId + "/stages/" + stageId +
+            "/elements?page=0&size=50" + includeRetiredQuery(includeRetiredElementsInput));
+        const elements = payloadItems(payload);
+        elementsListEl.innerHTML = "";
+        if (elements.length === 0) {
+            clearList(elementsListEl, "No elements found for stage " + stageId + ".");
+            return;
+        }
+        elements.forEach((element) => {
+            const actions = [
+                {label: "Select", handler: () => selectElement(applicationId, stageId, element.id, element)}
+            ];
+            if (element.retired) {
+                actions.push({
+                    label: "Restore",
+                    handler: () => restoreResource(
+                        restorePath(element,
+                            "/api/applications/" + applicationId + "/stages/" + stageId + "/elements/" +
+                            element.id + "/restore"),
+                        "Element restore requested.",
+                        loadElements)
+                });
+            } else {
+                actions.push({
+                    label: "Promote",
+                    handler: () => {
+                        const targetStageId = readTargetStageId(promoteElementsTargetStageIdInput,
+                            "element");
+                        if (!targetStageId) {
+                            return null;
+                        }
+                        return promoteResource(
+                            promotePath(element,
+                                "/api/applications/" + applicationId + "/stages/" + stageId +
+                                "/elements/" + element.id + "/promote",
+                                targetStageId),
+                            "Element promote requested.",
+                            loadElements);
+                    }
+                });
+                actions.push({
+                    label: "Delete Shot",
+                    className: "secondary",
+                    handler: () => deleteResource(
+                        "/api/applications/" + applicationId + "/stages/" + stageId + "/elements/" + element.id + "/screenshot",
+                        "Element screenshot delete requested.",
+                        async () => {
+                            screenshotPreviewEl.innerHTML = "<span class=\"empty\">No screenshot loaded.</span>";
+                            await loadElements();
+                        })
+                });
+                actions.push({
+                    label: "Delete",
+                    className: "danger",
+                    handler: () => deleteResource(
+                        "/api/applications/" + applicationId + "/stages/" + stageId + "/elements/" + element.id,
+                        "Element delete requested.",
+                        loadElements)
+                });
+            }
+            elementsListEl.appendChild(createRow(
+                element.label || "Element #" + element.id,
+                retirementMeta(element, "id=" + element.id + " | " + (element.locatorType || "?") +
+                    " " + (element.locatorString || "")),
+                actions
+            ));
+        });
+    }
+
+    async function loadTestPlans() {
+        const applicationId = Number.parseInt(listTestPlansApplicationIdInput.value, 10);
+        const stageId = Number.parseInt(listTestPlansStageIdInput.value, 10);
+        if (!Number.isInteger(applicationId) || applicationId <= 0 ||
+            !Number.isInteger(stageId) || stageId <= 0) {
+            setStatus("Provide application and stage IDs to load test plans.", "warn");
+            return;
+        }
+        const payload = await getJson("/api/applications/" + applicationId + "/stages/" + stageId +
+            "/testPlans?page=0&size=50" + includeRetiredQuery(includeRetiredTestPlansInput));
+        const testPlans = payloadItems(payload);
+        testPlansListEl.innerHTML = "";
+        if (testPlans.length === 0) {
+            clearList(testPlansListEl, "No test plans found for stage " + stageId + ".");
+            return;
+        }
+        testPlans.forEach((testPlan) => {
+            const actions = [];
+            if (testPlan.retired) {
+                actions.push({
+                    label: "Restore",
+                    handler: () => restoreResource(
+                        restorePath(testPlan,
+                            "/api/applications/" + applicationId + "/stages/" + stageId + "/testPlans/" +
+                            testPlan.id + "/restore"),
+                        "Test plan restore requested.",
+                        loadTestPlans)
+                });
+            } else {
+                actions.push({
+                    label: "Promote",
+                    handler: () => {
+                        const targetStageId = readTargetStageId(promoteTestPlansTargetStageIdInput,
+                            "test plan");
+                        if (!targetStageId) {
+                            return null;
+                        }
+                        return promoteResource(
+                            promotePath(testPlan,
+                                "/api/applications/" + applicationId + "/stages/" + stageId +
+                                "/testPlans/" + testPlan.id + "/promote",
+                                targetStageId),
+                            "Test plan promote requested.",
+                            loadTestPlans);
+                    }
+                });
+                actions.push({
+                    label: "Delete",
+                    className: "danger",
+                    handler: () => deleteResource(
+                        "/api/applications/" + applicationId + "/stages/" + stageId + "/testPlans/" + testPlan.id,
+                        "Test plan delete requested.",
+                        loadTestPlans)
+                });
+            }
+            testPlansListEl.appendChild(createRow(
+                testPlan.label || "Test Plan #" + testPlan.id,
+                retirementMeta(testPlan, "id=" + testPlan.id),
+                actions
+            ));
+        });
+    }
+
+    async function refreshKnownLists() {
+        await loadApplications();
+        if (listStagesApplicationIdInput.value) {
+            await loadStages();
+        }
+        if (listElementsApplicationIdInput.value && listElementsStageIdInput.value) {
+            await loadElements();
+        }
+        if (listTestPlansApplicationIdInput.value && listTestPlansStageIdInput.value) {
+            await loadTestPlans();
+        }
+    }
+
+    applicationForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const payload = await sendJson("PUT", "/api/applications", {
+            label: applicationLabelInput.value.trim()
+        });
+        if (payload && payload.id) {
+            selectApplication(payload.id);
+            await loadApplications();
+        }
+    });
+
+    stageForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const applicationId = Number.parseInt(stageApplicationIdInput.value, 10);
+        const payload = await sendJson("PUT", "/api/applications/" + applicationId + "/stages", {
+            label: stageLabelInput.value.trim(),
+            url: stageUrlInput.value.trim()
+        });
+        if (payload && payload.id) {
+            selectStage(applicationId, payload.id);
+            await loadStages();
+        }
+    });
+
+    elementForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const applicationId = Number.parseInt(elementApplicationIdInput.value, 10);
+        const stageId = Number.parseInt(elementStageIdInput.value, 10);
+        const payload = await sendJson("PUT", "/api/applications/" + applicationId + "/stages/" + stageId + "/elements", {
+            type: elementTypeInput.value,
+            label: elementLabelInput.value.trim(),
+            locatorString: locatorStringInput.value.trim(),
+            locatorType: locatorTypeInput.value
+        });
+        if (payload && payload.id) {
+            selectElement(applicationId, stageId, payload.id, payload);
+            await loadElements();
+        }
+    });
+
+    screenshotForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const applicationId = Number.parseInt(screenshotApplicationIdInput.value, 10);
+        const stageId = Number.parseInt(screenshotStageIdInput.value, 10);
+        const elementId = Number.parseInt(screenshotElementIdInput.value, 10);
+        const file = screenshotFileInput.files[0];
+        if (!file) {
+            setStatus("Choose a screenshot file.", "warn");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("file", file);
+        const path = "/api/applications/" + applicationId + "/stages/" + stageId + "/elements/" + elementId + "/screenshot";
+        const url = apiUrl(path);
+        setStatus("PUT " + path, null);
+        const response = await fetch(url, {
+            method: "PUT",
+            headers: authHeaders({"Accept": "application/json"}),
+            body: formData
+        });
+        const payload = await parseResponse(response);
+        showResponse("PUT", url, response.status, payload);
+        if (!response.ok) {
+            setStatus("Screenshot upload failed with HTTP " + response.status + ".", "error");
+            return;
+        }
+        setStatus("Screenshot uploaded with HTTP " + response.status + ".", "success");
+        renderScreenshotPreview(applicationId, stageId, elementId, payload);
+        if (listElementsApplicationIdInput.value && listElementsStageIdInput.value) {
+            await loadElements();
+        }
+    });
+
+    deploymentForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const applicationId = Number.parseInt(deploymentApplicationIdInput.value, 10);
+        const stageId = Number.parseInt(deploymentStageIdInput.value, 10);
+        const version = deploymentVersionInput.value.trim();
+        if (!Number.isInteger(applicationId) || applicationId <= 0 || !Number.isInteger(stageId) || stageId <= 0) {
+            setStatus("Provide valid application and stage IDs.", "warn");
+            return;
+        }
+        if (!version) {
+            setStatus("Provide a deployment version.", "warn");
+            return;
+        }
+
+        let deployedAt;
+        try {
+            deployedAt = toIsoDateTime(deploymentDeployedAtInput.value);
+        } catch (error) {
+            setStatus(error.message, "warn");
+            return;
+        }
+
+        await sendJson("PUT", "/api/applications/" + applicationId + "/stages/" + stageId + "/deployments", {
+            version,
+            deployedAt
+        });
+    });
+
+    async function fetchKeycloakToken(event) {
+        event.preventDefault();
+        const formData = new FormData(tokenForm);
+        const baseUrl = String(formData.get("keycloakBaseUrl") || "").trim().replace(/\/+$/, "");
+        const realm = String(formData.get("keycloakRealm") || "").trim();
+        const clientId = String(formData.get("keycloakClientId") || "").trim();
+        const clientSecret = String(formData.get("keycloakClientSecret") || "").trim();
+        const username = String(formData.get("keycloakUsername") || "").trim();
+        const password = String(formData.get("keycloakPassword") || "");
+        if (!baseUrl || !realm || !clientId || !username || !password) {
+            setStatus("Missing required token request fields.", "warn");
+            return;
+        }
+        const body = new URLSearchParams();
+        body.set("grant_type", "password");
+        body.set("client_id", clientId);
+        body.set("username", username);
+        body.set("password", password);
+        if (clientSecret) {
+            body.set("client_secret", clientSecret);
+        }
+        const url = baseUrl + "/realms/" + encodeURIComponent(realm) + "/protocol/openid-connect/token";
+        setStatus("POST Keycloak token endpoint", null);
+        const response = await fetch(url, {
+            method: "POST",
+            headers: {"Content-Type": "application/x-www-form-urlencoded"},
+            body
+        });
+        const payload = await parseResponse(response);
+        showResponse("POST", url, response.status, payload);
+        if (!response.ok || !payload.access_token) {
+            setStatus("Token request failed with HTTP " + response.status + ".", "error");
+            return;
+        }
+        accessTokenInput.value = payload.access_token;
+        setStatus("Access token fetched and will be used for subsequent requests.", "success");
+    }
+
+    async function loadProfile() {
+        const payload = await getJson("/user/profile");
+        if (!payload) {
+            return;
+        }
+        profileFirstNameInput.value = payload.firstName || "";
+        profileLastNameInput.value = payload.lastName || "";
+        profileEmailInput.value = payload.email || "";
+        profilePhoneNumberInput.value = payload.phoneNumber || "";
+    }
+
+    profileForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const payload = await sendJson("PUT", "/user/profile", {
+            firstName: profileFirstNameInput.value,
+            lastName: profileLastNameInput.value,
+            email: profileEmailInput.value,
+            phoneNumber: profilePhoneNumberInput.value
+        });
+        if (payload) {
+            profileFirstNameInput.value = payload.firstName || "";
+            profileLastNameInput.value = payload.lastName || "";
+            profileEmailInput.value = payload.email || "";
+            profilePhoneNumberInput.value = payload.phoneNumber || "";
+        }
+    });
+
+    profilePictureForm.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const file = profilePictureFileInput.files[0];
+        if (!file) {
+            setStatus("Choose a profile picture file.", "warn");
+            return;
+        }
+        const formData = new FormData();
+        formData.append("file", file);
+        const path = "/user/profile/avatar";
+        const url = apiUrl(path);
+        setStatus("PUT " + path, null);
+        const response = await fetch(url, {
+            method: "PUT",
+            headers: authHeaders({"Accept": "application/json"}),
+            body: formData
+        });
+        const payload = await parseResponse(response);
+        showResponse("PUT", url, response.status, payload);
+        if (!response.ok) {
+            setStatus("Avatar upload failed with HTTP " + response.status + ".", "error");
+            return;
+        }
+        setStatus("Avatar uploaded with HTTP " + response.status + ".", "success");
+        await renderImagePreview(profilePicturePreviewEl, "/user/profile/avatar", "Profile picture",
+            "No profile picture available.");
+    });
+
+    async function deleteProfilePicture() {
+        await deleteResource("/user/profile/avatar", "Profile picture deleted.", async () => {
+            profilePicturePreviewEl.innerHTML = "<span class=\"empty\">No profile picture loaded.</span>";
+        });
+    }
+
+    document.getElementById("loadApplicationsBtn").addEventListener("click", loadApplications);
+    document.getElementById("loadStagesBtn").addEventListener("click", loadStages);
+    document.getElementById("loadElementsBtn").addEventListener("click", loadElements);
+    document.getElementById("loadTestPlansBtn").addEventListener("click", loadTestPlans);
+    includeRetiredApplicationsInput.addEventListener("change", loadApplications);
+    includeRetiredStagesInput.addEventListener("change", loadStages);
+    includeRetiredElementsInput.addEventListener("change", loadElements);
+    includeRetiredTestPlansInput.addEventListener("change", loadTestPlans);
+    document.getElementById("refreshAllBtn").addEventListener("click", refreshKnownLists);
+    document.getElementById("loadProfileBtn").addEventListener("click", loadProfile);
+    document.getElementById("loadProfilePictureBtn").addEventListener("click", () =>
+        renderImagePreview(profilePicturePreviewEl, "/user/profile/avatar", "Profile picture",
+            "No profile picture available."));
+    document.getElementById("deleteProfilePictureBtn").addEventListener("click", deleteProfilePicture);
+    document.getElementById("clearTokenBtn").addEventListener("click", () => {
+        accessTokenInput.value = "";
+        setStatus("Access token cleared.", "success");
+    });
+    tokenForm.addEventListener("submit", fetchKeycloakToken);
+    tabButtons.forEach((button) => {
+        button.addEventListener("click", () => activateTab(button.dataset.tab));
+    });
+
+    baseUrlInput.value = window.location.origin;
+    stageUrlInput.value = window.location.origin + "/dummy.html";
+    deploymentDeployedAtInput.value = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+        .toISOString()
+        .slice(0, 16);
+    loadApplications();
+</script>
+</body>
+</html>

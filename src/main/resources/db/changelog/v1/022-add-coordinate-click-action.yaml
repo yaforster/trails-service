@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: 022-add-coordinate-click-action
+      author: openai
+      changes:
+        - addColumn:
+            tableName: action_details_entity
+            columns:
+              - column:
+                  name: x_coordinate
+                  type: int
+              - column:
+                  name: y_coordinate
+                  type: int

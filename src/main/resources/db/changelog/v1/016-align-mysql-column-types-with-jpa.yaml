@@ -1,0 +1,157 @@
+databaseChangeLog:
+  - changeSet:
+      id: 016-align-result-success-type
+      author: codex
+      preConditions:
+        - onFail: MARK_RAN
+        - dbms:
+            type: mysql
+        - columnExists:
+            tableName: result_entity
+            columnName: success
+      changes:
+        - sql:
+            sql: ALTER TABLE result_entity MODIFY success bit(1) NOT NULL
+  - changeSet:
+      id: 016-align-technical-failure-message-type
+      author: codex
+      preConditions:
+        - onFail: MARK_RAN
+        - dbms:
+            type: mysql
+        - columnExists:
+            tableName: result_entity
+            columnName: exception_message_from_action
+      changes:
+        - sql:
+            sql: ALTER TABLE result_entity MODIFY exception_message_from_action longtext
+  - changeSet:
+      id: 016-align-application-retired-type
+      author: codex
+      preConditions:
+        - onFail: MARK_RAN
+        - dbms:
+            type: mysql
+        - columnExists:
+            tableName: application_entity
+            columnName: retired
+      changes:
+        - sql:
+            sql: ALTER TABLE application_entity MODIFY retired tinyint NOT NULL DEFAULT 0
+  - changeSet:
+      id: 016-align-stage-retired-type
+      author: codex
+      preConditions:
+        - onFail: MARK_RAN
+        - dbms:
+            type: mysql
+        - columnExists:
+            tableName: stage_entity
+            columnName: retired
+      changes:
+        - sql:
+            sql: ALTER TABLE stage_entity MODIFY retired tinyint NOT NULL DEFAULT 0
+  - changeSet:
+      id: 016-align-element-retired-type
+      author: codex
+      preConditions:
+        - onFail: MARK_RAN
+        - dbms:
+            type: mysql
+        - columnExists:
+            tableName: element_entity
+            columnName: retired
+      changes:
+        - sql:
+            sql: ALTER TABLE element_entity MODIFY retired tinyint NOT NULL DEFAULT 0
+  - changeSet:
+      id: 016-align-test-plan-retired-type
+      author: codex
+      preConditions:
+        - onFail: MARK_RAN
+        - dbms:
+            type: mysql
+        - columnExists:
+            tableName: test_plan_entity
+            columnName: retired
+      changes:
+        - sql:
+            sql: ALTER TABLE test_plan_entity MODIFY retired tinyint NOT NULL DEFAULT 0
+  - changeSet:
+      id: 016-align-test-data-set-retired-type
+      author: codex
+      preConditions:
+        - onFail: MARK_RAN
+        - dbms:
+            type: mysql
+        - columnExists:
+            tableName: test_data_set_entity
+            columnName: retired
+      changes:
+        - sql:
+            sql: ALTER TABLE test_data_set_entity MODIFY retired tinyint NOT NULL DEFAULT 0
+  - changeSet:
+      id: 016-align-clear-before-typing-type
+      author: codex
+      preConditions:
+        - onFail: MARK_RAN
+        - dbms:
+            type: mysql
+        - columnExists:
+            tableName: action_details_entity
+            columnName: clear_before_typing
+      changes:
+        - sql:
+            sql: ALTER TABLE action_details_entity MODIFY clear_before_typing bit(1) NOT NULL DEFAULT b'0'
+  - changeSet:
+      id: 016-align-document-case-sensitive-type
+      author: codex
+      preConditions:
+        - onFail: MARK_RAN
+        - dbms:
+            type: mysql
+        - columnExists:
+            tableName: action_details_entity
+            columnName: document_case_sensitive
+      changes:
+        - sql:
+            sql: ALTER TABLE action_details_entity MODIFY document_case_sensitive bit(1) DEFAULT b'0'
+  - changeSet:
+      id: 016-align-downloaded-file-content-type
+      author: codex
+      preConditions:
+        - onFail: MARK_RAN
+        - dbms:
+            type: mysql
+        - columnExists:
+            tableName: downloaded_file_entity
+            columnName: content
+      changes:
+        - sql:
+            sql: ALTER TABLE downloaded_file_entity MODIFY content longblob
+  - changeSet:
+      id: 016-align-element-screenshot-content-type
+      author: codex
+      preConditions:
+        - onFail: MARK_RAN
+        - dbms:
+            type: mysql
+        - columnExists:
+            tableName: element_screenshot_entity
+            columnName: content
+      changes:
+        - sql:
+            sql: ALTER TABLE element_screenshot_entity MODIFY content longblob
+  - changeSet:
+      id: 016-align-result-screenshot-content-type
+      author: codex
+      preConditions:
+        - onFail: MARK_RAN
+        - dbms:
+            type: mysql
+        - columnExists:
+            tableName: result_screenshot_entity
+            columnName: content
+      changes:
+        - sql:
+            sql: ALTER TABLE result_screenshot_entity MODIFY content longblob NOT NULL

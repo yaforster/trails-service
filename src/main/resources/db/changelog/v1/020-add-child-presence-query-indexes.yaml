@@ -1,0 +1,29 @@
+databaseChangeLog:
+  - changeSet:
+      id: 020-add-child-presence-query-indexes
+      author: openai
+      changes:
+        - createIndex:
+            indexName: idx_stage_application_retired
+            tableName: stage_entity
+            columns:
+              - column:
+                  name: application_id
+              - column:
+                  name: retired
+        - createIndex:
+            indexName: idx_element_application_stage_retired
+            tableName: element_entity
+            columns:
+              - column:
+                  name: application_id
+              - column:
+                  name: stage_id
+              - column:
+                  name: retired
+        - createIndex:
+            indexName: idx_action_test_plan
+            tableName: action_entity
+            columns:
+              - column:
+                  name: test_plan_id

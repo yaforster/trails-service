@@ -1,0 +1,10 @@
+databaseChangeLog:
+  - changeSet:
+      id: 202605060030-1
+      author: codex
+      dbms: mysql
+      changes:
+        - modifyDataType:
+            tableName: user_profile_entity
+            columnName: profile_picture_content
+            newDataType: mediumblob

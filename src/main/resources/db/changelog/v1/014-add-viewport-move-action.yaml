@@ -1,0 +1,23 @@
+databaseChangeLog:
+  - changeSet:
+      id: 014-add-viewport-move-action-1
+      author: codex
+      changes:
+        - addColumn:
+            tableName: action_details_entity
+            columns:
+              - column:
+                  name: movement
+                  type: varchar(32)
+              - column:
+                  name: direction
+                  type: varchar(16)
+              - column:
+                  name: amount
+                  type: double
+              - column:
+                  name: unit
+                  type: varchar(16)
+              - column:
+                  name: delay_after_move_millis
+                  type: bigint

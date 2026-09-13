@@ -1,0 +1,100 @@
+spring:
+  jackson:
+    default-property-inclusion: non_empty
+  servlet:
+    multipart:
+      max-file-size: ${SERVICE_FILES_USER_IMG_MAX_SIZE:5MB}
+      max-request-size: ${SPRING_SERVLET_MULTIPART_MAX_REQUEST_SIZE:6MB}
+  web:
+    resources:
+      add-mappings: false
+  datasource:
+    url: ""
+    username: ""
+    password: ""
+    driver-class-name: ""
+  jpa:
+    hibernate:
+      ddl-auto: validate
+logging:
+  charset:
+    console: UTF-8
+  level:
+    root: INFO
+  pattern:
+    console: '[%d{yyyy-MM-dd HH:mm:ss.SSS}][%replace(%logger){''([^.])[^.]*\.'', ''$1.''}][%X{correlationId:-}]: %msg%n'
+service:
+  serve-demo-resources: ""
+  test-execution:
+    maximum-concurrent-runs: ${SERVICE_TEST_EXECUTION_MAXIMUM_CONCURRENT_RUNS:16}
+    run-queue-capacity: ${SERVICE_TEST_EXECUTION_RUN_QUEUE_CAPACITY:64}
+    maximum-concurrent-test-sets: ${SERVICE_TEST_EXECUTION_MAXIMUM_CONCURRENT_TEST_SETS:16}
+  files:
+    user:
+      img:
+        max-size: ${SERVICE_FILES_USER_IMG_MAX_SIZE:5MB}
+        max-width: ${SERVICE_FILES_USER_IMG_MAX_WIDTH:1920}
+        max-height: ${SERVICE_FILES_USER_IMG_MAX_HEIGHT:1920}
+  webdrivers:
+    general:
+      fileDownload:
+        timeoutMillis: ${SERVICE_WEBDRIVERS_GENERAL_FILEDOWNLOAD_TIMEOUTMILLIS:30000}
+      gridUrl: ${SERVICE_WEBDRIVERS_GENERAL_GRIDURL:}
+      browserBaseUrl: ${SERVICE_WEBDRIVERS_GENERAL_BROWSERBASEURL:}
+  api:
+    error-handling:
+      add-stacktrace-to-response: ""
+    security:
+      csrf:
+        enabled: ${SERVICE_API_SECURITY_CSRF_ENABLED:false}
+      roles:
+        trails-test-manager: ${SERVICE_API_SECURITY_ROLES_TRAILS_TEST_MANAGER:}
+        trails-tester: ${SERVICE_API_SECURITY_ROLES_TRAILS_TESTER:}
+        trails-admin: ${SERVICE_API_SECURITY_ROLES_TRAILS_ADMIN:}
+      deployments:
+        role: ${SERVICE_API_SECURITY_DEPLOYMENTS_ROLE:}
+        role-claim-paths: ${SERVICE_API_SECURITY_DEPLOYMENTS_ROLE_CLAIM_PATHS:realm_access.roles,resource_access.*.roles,roles,authorities}
+      oauth2:
+        enabled: ${SERVICE_API_SECURITY_OAUTH2_ENABLED:false}
+        authority-prefix: ${SERVICE_API_SECURITY_OAUTH2_AUTHORITY_PREFIX:ROLE_}
+        role-claim-paths: ${SERVICE_API_SECURITY_OAUTH2_ROLE_CLAIM_PATHS:realm_access.roles,resource_access.*.roles,roles,authorities}
+resilience4j:
+  retry:
+    configs:
+      selenium:
+        max-attempts: ${RESILIENCE4J_RETRY_CONFIGS_SELENIUM_MAX_ATTEMPTS:3}
+        wait-duration: ${RESILIENCE4J_RETRY_CONFIGS_SELENIUM_WAIT_DURATION:500ms}
+    instances:
+      seleniumChrome:
+        base-config: selenium
+      seleniumFirefox:
+        base-config: selenium
+      seleniumEdge:
+        base-config: selenium
+  circuitbreaker:
+    configs:
+      selenium:
+        sliding-window-type: count_based
+        sliding-window-size: ${RESILIENCE4J_CIRCUITBREAKER_CONFIGS_SELENIUM_SLIDING_WINDOW_SIZE:10}
+        minimum-number-of-calls: ${RESILIENCE4J_CIRCUITBREAKER_CONFIGS_SELENIUM_MINIMUM_NUMBER_OF_CALLS:5}
+        failure-rate-threshold: ${RESILIENCE4J_CIRCUITBREAKER_CONFIGS_SELENIUM_FAILURE_RATE_THRESHOLD:50}
+        wait-duration-in-open-state: ${RESILIENCE4J_CIRCUITBREAKER_CONFIGS_SELENIUM_WAIT_DURATION_IN_OPEN_STATE:30s}
+        permitted-number-of-calls-in-half-open-state: ${RESILIENCE4J_CIRCUITBREAKER_CONFIGS_SELENIUM_PERMITTED_NUMBER_OF_CALLS_IN_HALF_OPEN_STATE:2}
+    instances:
+      seleniumChrome:
+        base-config: selenium
+      seleniumFirefox:
+        base-config: selenium
+      seleniumEdge:
+        base-config: selenium
+  bulkhead:
+    instances:
+      seleniumChrome:
+        max-concurrent-calls: ${RESILIENCE4J_BULKHEAD_INSTANCES_SELENIUMCHROME_MAX_CONCURRENT_CALLS:20}
+        max-wait-duration: ${RESILIENCE4J_BULKHEAD_INSTANCES_SELENIUMCHROME_MAX_WAIT_DURATION:5s}
+      seleniumFirefox:
+        max-concurrent-calls: ${RESILIENCE4J_BULKHEAD_INSTANCES_SELENIUMFIREFOX_MAX_CONCURRENT_CALLS:20}
+        max-wait-duration: ${RESILIENCE4J_BULKHEAD_INSTANCES_SELENIUMFIREFOX_MAX_WAIT_DURATION:5s}
+      seleniumEdge:
+        max-concurrent-calls: ${RESILIENCE4J_BULKHEAD_INSTANCES_SELENIUMEDGE_MAX_CONCURRENT_CALLS:20}
+        max-wait-duration: ${RESILIENCE4J_BULKHEAD_INSTANCES_SELENIUMEDGE_MAX_WAIT_DURATION:5s}

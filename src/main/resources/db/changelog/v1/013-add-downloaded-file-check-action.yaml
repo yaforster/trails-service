@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: 013-add-downloaded-file-check-action-1
+      author: codex
+      changes:
+        - addColumn:
+            tableName: action_details_entity
+            columns:
+              - column:
+                  name: downloaded_file_name
+                  type: varchar(255)

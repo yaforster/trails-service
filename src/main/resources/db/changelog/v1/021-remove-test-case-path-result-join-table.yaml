@@ -1,0 +1,17 @@
+databaseChangeLog:
+  - changeSet:
+      id: 021-remove-test-case-path-result-join-table
+      author: openai
+      preConditions:
+        onFail: MARK_RAN
+        tableExists:
+          tableName: test_case_result_entity_results
+      changes:
+        - dropForeignKeyConstraint:
+            baseTableName: test_case_result_entity_results
+            constraintName: FKm0eooe8yc5m0lx4b78a0bjaxy
+        - dropForeignKeyConstraint:
+            baseTableName: test_case_result_entity_results
+            constraintName: FKnetjrh3mglw5wsojp6rftb617
+        - dropTable:
+            tableName: test_case_result_entity_results

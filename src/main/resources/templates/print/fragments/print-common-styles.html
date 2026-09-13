@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:fragment="printCommonStyles">
+        <style>
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                background: #f6f6f6;
+                color: #222222;
+                font-family: Arial, Helvetica, sans-serif;
+                font-size: 13px;
+                line-height: 1.25;
+            }
+
+            .header,
+            .path-section {
+                background: #ffffff;
+                border: 1px solid #999999;
+                border-radius: 4px;
+            }
+
+            .header h1 {
+                font-size: 18px;
+            }
+
+            .path-section h2 {
+                font-size: 16px;
+            }
+
+            .header-meta-item {
+                background: #fefefe;
+                border: 1px solid #dddddd;
+                border-radius: 4px;
+            }
+
+            .header-meta-label,
+            .action-field-label {
+                color: #555555;
+                font-size: 11px;
+            }
+
+            .header-meta-value {
+                font-size: 14px;
+                font-weight: 700;
+            }
+
+            .action-field {
+                background: #ffffff;
+                border: 1px solid #dddddd;
+                border-radius: 4px;
+            }
+
+            .action-field-value {
+                font-size: 13px;
+                font-weight: 700;
+            }
+
+            .result-success {
+                background: #5ab55a;
+            }
+
+            .result-skipped {
+                background: #959595;
+            }
+
+            .result-failure {
+                background: #d13535;
+            }
+
+            .action-card {
+                border: 1px solid #999999;
+                border-radius: 4px;
+            }
+
+            .print-empty-state {
+                background: #ffffff;
+            }
+
+        </style>
+    </th:block>
+</head>
+</html>

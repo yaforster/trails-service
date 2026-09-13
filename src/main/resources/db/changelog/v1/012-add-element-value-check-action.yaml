@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: 012-add-element-value-check-action-1
+      author: codex
+      changes:
+        - addColumn:
+            tableName: action_details_entity
+            columns:
+              - column:
+                  name: value_source
+                  type: varchar(32)
+              - column:
+                  name: value_name
+                  type: varchar(255)
