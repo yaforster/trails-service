@@ -53,6 +53,79 @@ Settings are grouped by the feature that uses them, while retaining the same YAM
 In practical terms, changing a browser setting cannot accidentally alter security behavior, and invalid image limits or an
 incomplete enabled OAuth2 setup stop the service during startup rather than causing a failure later during a test run.
 
+## Manual Deployment
+
+Use this section when the surrounding services are provisioned separately rather than by a local Compose stack. Trails
+does not provide production manifests or a supported host-OS matrix. The supplied container runtime uses
+`eclipse-temurin:25-jre-noble`; for a non-container deployment, provide a Java 25 runtime supported by the chosen
+platform. Linux amd64 is the practical baseline when Chrome, Firefox, and Edge Grid nodes are all required: the Selenium
+Edge Linux image is amd64-only. Pin and vet all image tags and base-image updates through your normal platform process.
+
+| Component | Required when | Provisioning requirement |
+| --- | --- | --- |
+| Trails Service | Always | Run the image built from this repository or the packaged JAR. It listens on Spring Boot's default internal port `8080` unless `SERVER_PORT` changes it. |
+| MySQL | Always | Create a persistent database and a least-privilege service account. Configure the datasource values; Liquibase creates and updates the schema, while Hibernate validates it. Back up and restore this data as application state. |
+| Selenium Grid Router/Hub | Browser tests run | Provide a Grid endpoint with reachable nodes for every requested browser. Current local reference images are `selenium/hub:4.43.0` and `selenium/node-{chrome,firefox,edge}:4.43.0`; use a compatible, explicitly pinned release in managed environments. |
+| Selenium browser nodes | Browser tests run | Size nodes for expected parallel sessions, reserve at least `2g` shared memory for containerized browsers, enable managed downloads, and set node session limits deliberately. No shared download filesystem is required. |
+| OIDC/JWT identity provider | `SERVICE_API_SECURITY_OAUTH2_ENABLED=true` | Use an issuer compatible with OAuth2 resource-server JWT validation. Keycloak is one local reference (`quay.io/keycloak/keycloak:26.6.1`), not a requirement; persist and back up its configuration. |
+| Reverse proxy / ingress | Public or TLS-exposed API | Terminate TLS and restrict public routes. Set `SERVER_FORWARD_HEADERS_STRATEGY=framework` when the proxy supplies forwarded headers. |
+
+The frontend, documentation site, and Trails Scout are separate clients, not backend startup dependencies. MySQL must be
+ready before Trails starts. Start Grid and its browser nodes before accepting browser-test work. Start the identity
+provider before enabling OAuth2/JWT validation.
+
+### Network And Firewall Rules
+
+Allow these routes by DNS name or stable address. Keep database, Grid control, and browser-node ports on private
+networks; they are not public API endpoints.
+
+| Source | Destination | Port / protocol | Why |
+| --- | --- | --- | --- |
+| Client or reverse proxy | Trails Service | TLS public port; typically HTTP `8080` behind the proxy | API and health access. |
+| Trails Service | MySQL | TCP `3306` | Application data and Liquibase migrations. |
+| Trails Service | Selenium Grid Router | TCP `4444` | Remote WebDriver session creation and execution. |
+| Selenium node | Grid Hub event bus | TCP `4442`, `4443` | Node registration and Grid events when nodes run on separate hosts. |
+| Grid Hub/Distributor | Selenium node advertised endpoint | TCP `5555` by default | Grid sends commands to registered remote nodes. Use unique advertised ports when nodes share a host. |
+| Selenium node/browser | Application under test | TCP `80`, `443`, or stage-specific ports | Browser navigation resolves from the node, not from Trails or the operator workstation. |
+| Selenium node/browser | Trails browser base URL | Applicable HTTP(S) port | Needed when a loopback stage URL is rewritten to the configured browser-facing address. |
+| Trails Service | OIDC issuer or JWK endpoint | TCP `443` or provider-specific port | JWT metadata/key retrieval when OAuth2 is enabled. |
+| User browser or frontend | OIDC issuer | TLS public port | Interactive login, when used. |
+
+For co-located Grid components, the event-bus and node routes can remain inside the restricted Grid network. For
+cross-host Grid deployments, publish and firewall them explicitly. Do not treat Trails CORS behavior as network access
+control: it permits credential-free browser preflight handling, not access to protected API operations.
+
+### Wiring Checklist
+
+1. Configure `SPRING_DATASOURCE_URL`, `SPRING_DATASOURCE_USERNAME`, `SPRING_DATASOURCE_PASSWORD`, and, when needed,
+   `SPRING_DATASOURCE_DRIVER_CLASS_NAME` from the platform secret store.
+2. Set `SERVICE_WEBDRIVERS_GENERAL_GRIDURL` to the Grid Router URL reachable from Trails.
+3. Set `SERVICE_WEBDRIVERS_GENERAL_BROWSERBASEURL` to an address reachable from browser nodes when stages use
+   `localhost`, `127.0.0.1`, or `::1`. Trails replaces only the scheme and authority, preserving the stage path, query,
+   and fragment. Do not use the operator workstation's loopback address.
+4. Align `SERVICE_TEST_EXECUTION_MAXIMUM_CONCURRENT_RUNS`,
+   `SERVICE_TEST_EXECUTION_RUN_QUEUE_CAPACITY`, and
+   `SERVICE_TEST_EXECUTION_MAXIMUM_CONCURRENT_TEST_SETS` with actual Grid capacity. Defaults admit 16 active runs, queue
+   64, and run 16 test sets.
+5. Leave `SERVICE_API_SECURITY_OAUTH2_ENABLED=false` for an intentionally trusted internal deployment. When enabling it,
+   configure exactly one of `SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_ISSUER_URI` or
+   `SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK_SET_URI`, all four Trails role settings, and the applicable role-claim
+   paths. Keep CSRF disabled for bearer-token REST clients unless cookie/session flows are deliberately introduced.
+
+An issuer URL used by a browser can differ from the JWK URL used by Trails if each resolves the provider through a
+different network. Both must be valid from their respective callers. Store database, identity-provider, and service
+secrets in the deployment platform; do not place them in repository files or image layers.
+
+### Startup Verification
+
+1. Verify DNS, TLS, and firewall routes from each source listed above.
+2. Confirm MySQL connectivity, then start Trails and allow Liquibase to validate or migrate the schema.
+3. Confirm Grid reports all required browser nodes at its `/status` endpoint and create one session per required browser.
+4. Check `GET /actuator/health` and `GET /api/capabilities` through the intended ingress policy.
+5. When OAuth2 is enabled, validate JWT key retrieval and one token for every required Trails role.
+6. Run a browser test against a non-loopback stage and, when relevant, a loopback stage using the configured browser base
+   URL. Verify managed-download behavior without mounting a host download directory.
+
 ## Generated Contracts And Database
 
 The REST contract lives in `src/main/resources/api/hateoas.yaml`. Controllers implement generated interfaces and use
