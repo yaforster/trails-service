@@ -19,6 +19,4 @@ public class ActionResultModel extends RepresentationModel<ActionResultModel> {
 
 	private final ActionResultType resultType;
 
-	private final String exceptionMessageFromAction;
-
 }

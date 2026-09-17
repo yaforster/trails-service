@@ -33,7 +33,6 @@ class ActionResultModelAssemblerTest {
 		assertEquals("Open Login", model.getLabel());
 		assertEquals("Executed", model.getResultMessage());
 		assertEquals(ActionResultType.SUCCESS, model.getResultType());
-		assertNull(model.getExceptionMessageFromAction());
 
 		assertEquals(3, model.getLinks().toList().size());
 		assertLinkContainsId(model.getRequiredLink("collection"), 1L, 2L, 3L, 4L, 7L);
@@ -57,7 +56,8 @@ class ActionResultModelAssemblerTest {
 	}
 
 	private void assertResultTypeMapping(ActionResultType source) {
-		PersistedActionResult persistedActionResult = new PersistedActionResult(1L, 2L, 3L, "l", "m", source, "e");
+		PersistedActionResult persistedActionResult = new PersistedActionResult(1L, 2L, 3L, "l", "m", source,
+				"internal diagnostic");
 		PersistedActionResultContext context = PersistedActionResultContext.of(1L, 2L, 3L, 4L, 2L,
 				persistedActionResult, true);
 

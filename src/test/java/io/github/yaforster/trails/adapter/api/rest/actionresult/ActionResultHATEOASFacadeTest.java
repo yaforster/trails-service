@@ -39,8 +39,8 @@ class ActionResultHATEOASFacadeTest {
 		PersistedActionResult second = new PersistedActionResult(10L, 100L, 8L, "second", "ok",
 				ActionResultType.SUCCESS, null);
 
-		ActionResultModel firstModel = new ActionResultModel(9L, 7L, "first", "ok", ActionResultType.SUCCESS, null);
-		ActionResultModel secondModel = new ActionResultModel(10L, 8L, "second", "ok", ActionResultType.SUCCESS, null);
+		ActionResultModel firstModel = new ActionResultModel(9L, 7L, "first", "ok", ActionResultType.SUCCESS);
+		ActionResultModel secondModel = new ActionResultModel(10L, 8L, "second", "ok", ActionResultType.SUCCESS);
 		when(assembler.toModel(any(PersistedActionResultContext.class))).thenAnswer(invocation -> {
 			PersistedActionResultContext context = invocation.getArgument(0);
 			return context.persistedActionResult().id().equals(9L) ? firstModel : secondModel;

@@ -13,6 +13,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 class BrowserElementActionsTest {
 
@@ -34,15 +35,16 @@ class BrowserElementActionsTest {
 
 	@Test
 	void checkExistence_returnsValidationFailure_whenPortDoesNotFindElement() {
-		Result result = CheckExistenceAction.builder()
-			.actionID(1L)
-			.label("exists")
-			.nextActions(List.of())
-			.locatorForElementToActOn(LOCATOR)
-			.build()
-			.execute(TestExecutionContexts.withBrowser(new TestExecutionContexts.FakeBrowserSession()));
+		ValidationFailure result = assertInstanceOf(ValidationFailure.class,
+				CheckExistenceAction.builder()
+					.actionID(1L)
+					.label("exists")
+					.nextActions(List.of())
+					.locatorForElementToActOn(LOCATOR)
+					.build()
+					.execute(TestExecutionContexts.withBrowser(new TestExecutionContexts.FakeBrowserSession())));
 
-		assertInstanceOf(ValidationFailure.class, result);
+		assertEquals("The required web page element was not found.", result.getResultMessage());
 	}
 
 	@Test
@@ -60,7 +62,7 @@ class BrowserElementActionsTest {
 					.build()
 					.execute(TestExecutionContexts.withBrowser(browser)));
 
-		assertEquals(null, result.getBase64Screenshot());
+		assertNull(result.getBase64Screenshot());
 	}
 
 	@Test
@@ -79,16 +81,17 @@ class BrowserElementActionsTest {
 
 	@Test
 	void click_returnsTechnicalFailure_whenPortFails() {
-		Result result = ClickAction.builder()
-			.actionID(2L)
-			.label("click")
-			.nextActions(List.of())
-			.locatorForElementToActOn(LOCATOR)
-			.build()
-			.execute(TestExecutionContexts.withBrowser(new TestExecutionContexts.FakeBrowserSession()
-				.operationFailure(new IllegalStateException("click failed"))));
+		TechnicalFailure result = assertInstanceOf(TechnicalFailure.class,
+				ClickAction.builder()
+					.actionID(2L)
+					.label("click")
+					.nextActions(List.of())
+					.locatorForElementToActOn(LOCATOR)
+					.build()
+					.execute(TestExecutionContexts.withBrowser(new TestExecutionContexts.FakeBrowserSession()
+						.operationFailure(new IllegalStateException("io.github.yaforster.trails.Selenium failed")))));
 
-		assertInstanceOf(TechnicalFailure.class, result);
+		assertEquals("Could not interact with the required web page element.", result.getResultMessage());
 	}
 
 	@Test
