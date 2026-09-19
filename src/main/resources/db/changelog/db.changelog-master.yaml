@@ -45,3 +45,11 @@ databaseChangeLog:
       file: db/changelog/v1/022-add-coordinate-click-action.yaml
   - include:
       file: db/changelog/v1/023-add-resize-viewport-action.yaml
+  - include:
+      file: db/changelog/v1/024-expand-element-locator.yaml
+  - include:
+      file: db/changelog/v1/025-expand-result-message.yaml
+  - include:
+      file: db/changelog/v1/026-expand-user-defined-value-fields.yaml
+  - include:
+      file: db/changelog/v1/027-restore-test-data-entry-value-not-null.yaml

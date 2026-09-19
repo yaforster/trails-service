@@ -1,0 +1,29 @@
+databaseChangeLog:
+  - changeSet:
+      id: 026-expand-user-defined-value-fields
+      author: yaforster
+      changes:
+        - modifyDataType:
+            tableName: test_data_entry_entity
+            columnName: entry_value
+            newDataType: text
+        - modifyDataType:
+            tableName: value_computation_instruction_entity
+            columnName: fixed_value
+            newDataType: text
+        - modifyDataType:
+            tableName: value_computation_instruction_entity
+            columnName: default_value
+            newDataType: text
+        - modifyDataType:
+            tableName: value_computation_instruction_entity
+            columnName: prefix
+            newDataType: text
+        - modifyDataType:
+            tableName: value_computation_instruction_entity
+            columnName: suffix
+            newDataType: text
+        - modifyDataType:
+            tableName: value_computation_instruction_entity
+            columnName: char_pool
+            newDataType: text

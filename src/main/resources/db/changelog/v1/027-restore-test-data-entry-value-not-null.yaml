@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - changeSet:
+      id: 027-restore-test-data-entry-value-not-null
+      author: yaforster
+      changes:
+        - addNotNullConstraint:
+            tableName: test_data_entry_entity
+            columnName: entry_value
+            columnDataType: text

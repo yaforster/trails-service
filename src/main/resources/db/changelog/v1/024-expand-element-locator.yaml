@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - changeSet:
+      id: 024-expand-element-locator
+      author: yaforster
+      changes:
+        - modifyDataType:
+            tableName: element_entity
+            columnName: locator
+            newDataType: text

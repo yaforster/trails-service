@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - changeSet:
+      id: 025-expand-result-message
+      author: yaforster
+      changes:
+        - modifyDataType:
+            tableName: result_entity
+            columnName: message
+            newDataType: text
