@@ -56,11 +56,9 @@ public class TestExecutionEventFacade {
 	}
 
 	private ErrorAsyncDTO toErrorDTO(Exception exception) {
-		ErrorAsyncDTO error = ErrorAsyncDTO.builder()
-			.message(errorMessage(exception))
-			.problematicElement(exception.getClass().getSimpleName())
-			.build();
+		ErrorAsyncDTO error = ErrorAsyncDTO.builder().message(errorMessage(exception)).build();
 		if (properties.addStacktraceToResponse()) {
+			error.setProblematicElement(exception.getClass().getSimpleName());
 			error.setStacktrace(ExceptionUtils.getStackTrace(exception));
 		}
 		return error;

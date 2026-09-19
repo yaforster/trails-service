@@ -20,7 +20,7 @@ class PagedActionResultMapperTest {
 	@Test
 	void mapsPagedAndSingleActionResultModelToDto() {
 		ActionResultDTOMapper actionResultDTOMapper = mock(ActionResultDTOMapper.class);
-		ActionResultModel model = new ActionResultModel(1L, 2L, "label", "result", ActionResultType.SUCCESS, null);
+		ActionResultModel model = new ActionResultModel(1L, 2L, "label", "result", ActionResultType.SUCCESS);
 		ActionResultDTO itemDto = new ActionResultDTO();
 		itemDto.setId(1L);
 		when(actionResultDTOMapper.toDTO(model)).thenReturn(itemDto);

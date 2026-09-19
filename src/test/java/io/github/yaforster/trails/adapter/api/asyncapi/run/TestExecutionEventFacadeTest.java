@@ -18,6 +18,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -105,7 +106,7 @@ class TestExecutionEventFacadeTest {
 	}
 
 	@Test
-	void toFailedEventDTO_shouldSetProblematicElementToExceptionClassName() {
+	void toFailedEventDTO_shouldHideDiagnosticDetails_whenStacktracesAreDisabled() {
 		UUID executionId = UUID.randomUUID();
 		ArgumentCaptor<ErrorAsyncDTO> errorCaptor = ArgumentCaptor.forClass(ErrorAsyncDTO.class);
 		TestExecutionEventDTOMapper mapper = mock(TestExecutionEventDTOMapper.class);
@@ -118,7 +119,8 @@ class TestExecutionEventFacadeTest {
 		verify(mapper).toFailedDTO(eq(executionId), eq(TestExecutionFailedEventAsyncDTO.Status.FAILED),
 				eq("Async API processing failed"), errorCaptor.capture(), eq(Links.NONE));
 
-		assertEquals("IllegalArgumentException", errorCaptor.getValue().getProblematicElement());
+		assertNull(errorCaptor.getValue().getProblematicElement());
+		assertNull(errorCaptor.getValue().getStacktrace());
 	}
 
 	@Test
@@ -137,6 +139,7 @@ class TestExecutionEventFacadeTest {
 				eq("Async API processing failed"), errorCaptor.capture(), eq(Links.NONE));
 
 		assertNotNull(errorCaptor.getValue().getStacktrace());
+		assertEquals("IllegalArgumentException", errorCaptor.getValue().getProblematicElement());
 	}
 
 	private PersistedTestRunResult persistedResult(Long id) {

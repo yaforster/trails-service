@@ -13,7 +13,7 @@ public abstract class WebpageAction extends Action {
 	protected final Locator locatorForElementToActOn;
 
 	protected String getTechnicalFailureMessage() {
-		return "Webpage Element was not found using locator: '" + locatorForElementToActOn.locatorString() + "'.";
+		return "Could not interact with the required web page element.";
 	}
 
 	@Override

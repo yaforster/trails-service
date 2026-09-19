@@ -39,6 +39,8 @@ Important settings:
   sets globally. Tune `SERVICE_TEST_EXECUTION_MAXIMUM_CONCURRENT_RUNS`,
   `SERVICE_TEST_EXECUTION_RUN_QUEUE_CAPACITY`, and `SERVICE_TEST_EXECUTION_MAXIMUM_CONCURRENT_TEST_SETS` to match Grid
   capacity.
+- Error diagnostics: leave `SERVICE_API_ERROR_HANDLING_ADDSTACKTRACETORESPONSE=false`. Set it to `true` only for
+  trusted diagnostic clients: failed execution events then include Java exception type and stacktrace details.
 - Demo pages: set `SERVICE_SERVE_DEMO_RESOURCES=true` only when you want the bundled static demo pages served by the
   backend.
 - OAuth2: set `SERVICE_API_SECURITY_OAUTH2_ENABLED=true` only when this service should validate JWT bearer tokens
@@ -151,9 +153,8 @@ because clicks, form submissions, uploads, and application-side effects are not 
 `RESIZE_VIEWPORT` changes current browser session any number of times in one test plan. Width and height are required
 positive signed 32-bit integers. Target is exact visible CSS viewport `window.innerWidth` × `window.innerHeight`, not
 outer window dimensions. Trails measures current inner viewport, makes one compensated outer-window `setSize` attempt,
-then measures once. No correction or retry occurs. Unsupported or clamped nodes produce a technical failure containing
-requested viewport, last measured viewport (or `unavailable`), and cause. Existing explicit waits remain responsible for
-waiting for application reflow.
+ then measures once. No correction or retry occurs. Unsupported or clamped nodes produce a technical failure. Existing
+ explicit waits remain responsible for waiting for application reflow.
 
 For an opt-in Chrome, Edge, and Firefox Grid smoke test, provide a loopback-reachable Selenium Hub and run:
 
@@ -163,7 +164,7 @@ $env:TRAILS_RESIZE_VIEWPORT_GRID_URL = 'http://127.0.0.1:4444'
 ```
 
 When `TRAILS_RESIZE_VIEWPORT_GRID_URL` is absent, `ResizeViewportGridIT` skips. When supplied, session-start failures
-fail test; each browser must report exact success or technical failure with complete diagnostic.
+ fail test; each browser must report exact success or a technical failure.
 
 Set each browser bulkhead close to the matching browser capacity in the Grid. A full bulkhead, open circuit, or
 exhausted retry causes that browser path to be skipped using the normal unavailable-browser result model.

@@ -2,6 +2,7 @@ package io.github.yaforster.trails.adapter.api;
 
 import io.github.yaforster.trails.adapter.api.rest.model.ValidationErrorDTO;
 import io.github.yaforster.trails.core.EntityMissingException;
+import io.github.yaforster.trails.core.MappingException;
 import io.github.yaforster.trails.core.ValidationViolation;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
@@ -22,6 +23,26 @@ class APIExceptionMapperTest {
 			.toErrorResponse(new EntityMissingException("missing"));
 
 		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+	}
+
+	@Test
+	void toErrorResponse_shouldUseSafeMessage_whenTrailsExceptionContainsTechnicalMessage() {
+		APIExceptionMapper mapper = mapper();
+
+		ResponseEntity<List<ValidationErrorDTO>> response = mapper
+			.toErrorResponse(new MappingException("io.github.yaforster.trails.InternalMapper failed"));
+
+		assertEquals("An unexpected error occurred.", response.getBody().getFirst().getMessage());
+	}
+
+	@Test
+	void toErrorResponse_shouldUseSafeNotFoundMessage_whenEntityIsMissing() {
+		APIExceptionMapper mapper = mapper();
+
+		ResponseEntity<List<ValidationErrorDTO>> response = mapper
+			.toErrorResponse(new EntityMissingException("database record 42"));
+
+		assertEquals("The requested resource was not found.", response.getBody().getFirst().getMessage());
 	}
 
 	@Test

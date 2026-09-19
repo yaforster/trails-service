@@ -16,7 +16,7 @@ class ActionResultDTOMapperTest {
 
 	@Test
 	void mapsActionResultModelToDto() {
-		ActionResultModel model = new ActionResultModel(1L, 2L, "label", "message", ActionResultType.SUCCESS, "ex");
+		ActionResultModel model = new ActionResultModel(1L, 2L, "label", "message", ActionResultType.SUCCESS);
 		model.add(Link.of("/action-results/1", "self"));
 
 		ActionResultDTO dto = mapper.toDTO(model);
@@ -26,7 +26,6 @@ class ActionResultDTOMapperTest {
 		assertEquals("label", dto.getLabel());
 		assertEquals("message", dto.getResultMessage());
 		assertEquals(ActionResultDTO.ResultTypeEnum.SUCCESS, dto.getResultType());
-		assertEquals("ex", dto.getExceptionMessageFromAction());
 		assertEquals("/action-results/1", dto.getLinks().get("self").getHref());
 	}
 

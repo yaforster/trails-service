@@ -44,7 +44,7 @@ public class APIExceptionMapper {
 	@VisibleForTesting
 	protected ResponseEntity<List<ValidationErrorDTO>> handleMiscellaneousTrailsException(TrailsException exception) {
 		log.error("TrailsException occurred:", exception);
-		ValidationViolation validationViolation = new ValidationViolation(GENERIC_TRAILS_ERROR, exception.getMessage(),
+		ValidationViolation validationViolation = new ValidationViolation(GENERIC_TRAILS_ERROR, exception.userMessage(),
 				GENERIC_ERROR_PATH);
 		return ResponseEntity.status(httpStatus(exception.errorClassification()))
 			.body(validationErrorDTOMapper.toDTOs(List.of(validationViolation)));
@@ -60,14 +60,9 @@ public class APIExceptionMapper {
 	@VisibleForTesting
 	protected ResponseEntity<List<ValidationErrorDTO>> handleUnexpectedException(Exception exception) {
 		log.error("Unexpected error occurred that is not a TrailsException:", exception);
-		ValidationViolation validationViolation = new ValidationViolation(INTERNAL_SERVER_ERROR,
-				getMessageFromException(exception), GENERIC_ERROR_PATH);
+		ValidationViolation validationViolation = new ValidationViolation(INTERNAL_SERVER_ERROR, DEFAULT_ERROR_MESSAGE,
+				GENERIC_ERROR_PATH);
 		return ResponseEntity.internalServerError().body(validationErrorDTOMapper.toDTOs(List.of(validationViolation)));
-	}
-
-	@VisibleForTesting
-	protected String getMessageFromException(Exception exception) {
-		return DEFAULT_ERROR_MESSAGE;
 	}
 
 }

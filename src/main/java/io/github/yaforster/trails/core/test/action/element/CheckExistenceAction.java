@@ -47,15 +47,11 @@ public class CheckExistenceAction extends WebpageAction {
 	}
 
 	private String getSuccessMessage() {
-		return "Successfully located an element on the current website using the "
-				+ getLocatorForElementToActOn().type().name() + " locator: "
-				+ getLocatorForElementToActOn().locatorString() + ".";
+		return "Successfully located the required web page element.";
 	}
 
 	private String getElementDoesNotExistMessage() {
-		return "No element could be found on the current website using the "
-				+ getLocatorForElementToActOn().type().name() + " locator: "
-				+ getLocatorForElementToActOn().locatorString() + ".";
+		return "The required web page element was not found.";
 	}
 
 }

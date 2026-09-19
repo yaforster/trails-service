@@ -21,8 +21,7 @@ public class ActionResultModelAssembler
 		PersistedActionResult persistedActionResult = context.persistedActionResult();
 
 		ActionResultModel model = new ActionResultModel(persistedActionResult.id(), persistedActionResult.actionId(),
-				persistedActionResult.label(), persistedActionResult.message(), persistedActionResult.resultType(),
-				persistedActionResult.exceptionMessageFromAction());
+				persistedActionResult.label(), persistedActionResult.message(), persistedActionResult.resultType());
 
 		model
 			.add(linkTo(methodOn(ActionResultController.class).listActionResultsChainInTestPath(context.applicationId(),

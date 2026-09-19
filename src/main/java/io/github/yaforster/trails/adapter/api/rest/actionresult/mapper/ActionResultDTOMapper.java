@@ -18,7 +18,6 @@ public interface ActionResultDTOMapper extends HATEOASMapper {
 	@Mapping(target = "label", source = "label")
 	@Mapping(target = "resultMessage", source = "resultMessage")
 	@Mapping(target = "resultType", source = "resultType")
-	@Mapping(target = "exceptionMessageFromAction", source = "exceptionMessageFromAction")
 	@Mapping(target = "links", source = "links")
 	ActionResultDTO toDTO(ActionResultModel model);
 
